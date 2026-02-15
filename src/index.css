@@ -56,3 +56,22 @@ body {
     padding: 0.5rem;
   }
 }
+
+/* Responsive button text */
+.mobile-text {
+  display: none;
+}
+
+.desktop-text {
+  display: inline;
+}
+
+@media (max-width: 550px) {
+  .mobile-text {
+    display: inline;
+  }
+  
+  .desktop-text {
+    display: none;
+  }
+}

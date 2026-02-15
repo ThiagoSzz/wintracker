@@ -39,6 +39,7 @@ export const WinLossTracker = () => {
   const { t } = useTranslation();
   const { currentUser } = useUserStore();
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
+  const [showUnsavedBanner, setShowUnsavedBanner] = useState(false);
 
   // Set page title
   useEffect(() => {
@@ -49,7 +50,7 @@ export const WinLossTracker = () => {
   const [editableMatches, setEditableMatches] = useState<EditableMatch[]>([]);
   const [newMatches, setNewMatches] = useState<NewMatch[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
+  const [isRemoveMode, setIsRemoveMode] = useState(false);
   const [deletedMatchIds, setDeletedMatchIds] = useState<Set<number>>(
     new Set(),
   );
@@ -94,16 +95,20 @@ export const WinLossTracker = () => {
       );
     });
 
-    const hasNewMatchChanges = newMatches.length > 0;
+    // Only consider new matches as changes if they have actual data entered
+    const hasNewMatchChanges = newMatches.some(match => 
+      match.opponent_name.trim().length > 0 || match.wins > 0 || match.losses > 0
+    );
     const hasLengthChanges = editableMatches.length !== originalMatches.length;
     const hasDeletedMatches = deletedMatchIds.size > 0;
 
-    setHasChanges(
-      hasEditChanges ||
+    const changes = hasEditChanges ||
         hasNewMatchChanges ||
         hasLengthChanges ||
-        hasDeletedMatches,
-    );
+        hasDeletedMatches;
+
+    setHasChanges(changes);
+    setShowUnsavedBanner(changes);
   }, [editableMatches, newMatches, originalMatches, deletedMatchIds]);
 
   // Handle changes from MatchRow components
@@ -144,10 +149,14 @@ export const WinLossTracker = () => {
     setDuplicateError(null);
   }, []);
 
-  // Edit mode handlers
-  const handleToggleEditMode = useCallback(() => {
-    setIsEditMode((prev) => !prev);
-    // Keep pending deletions when exiting edit mode so save button remains enabled
+  const closeUnsavedBanner = useCallback(() => {
+    setShowUnsavedBanner(false);
+  }, []);
+
+  // Remove mode handlers
+  const handleToggleRemoveMode = useCallback(() => {
+    setIsRemoveMode((prev) => !prev);
+    // Keep pending deletions when exiting remove mode so save button remains enabled
   }, []);
 
   // Handle marking match for deletion
@@ -229,7 +238,8 @@ export const WinLossTracker = () => {
       setDeletedMatchIds(new Set());
       setHasChanges(false);
       setDuplicateError(null);
-      setIsEditMode(false);
+      setIsRemoveMode(false);
+      setShowUnsavedBanner(false);
     } catch (error) {
       console.error("Error saving changes:", error);
     }
@@ -253,6 +263,7 @@ export const WinLossTracker = () => {
     setDeletedMatchIds(new Set());
     setHasChanges(false);
     setDuplicateError(null);
+    setShowUnsavedBanner(false);
   }, [originalMatches]);
 
   const { clearUser } = useUserStore();
@@ -312,40 +323,46 @@ export const WinLossTracker = () => {
         </Alert>
       )}
 
-      {/* Toolbar with Edit/Save/Revert buttons */}
-      <Group justify="space-between" style={{ marginBottom: "1rem" }}>
-        <Button variant="outline" onClick={handleToggleEditMode}>
-          {isEditMode ? t("stopEditingButton") : t("editButton")}
-        </Button>
+      {showUnsavedBanner && (
+        <Alert
+          color="blue"
+          style={{ marginBottom: "1rem" }}
+          withCloseButton
+          onClose={closeUnsavedBanner}
+          title={t("unsavedChanges")}
+        >
+          {t("unsavedChangesMessage")}
+        </Alert>
+      )}
 
-        <Group>
-          <Button
-            color="red"
-            variant="outline"
-            onClick={handleRevert}
-            disabled={!hasChanges}
-          >
-            {t("revertButton")}
-          </Button>
-          <Button
-            color="green"
-            onClick={handleSave}
-            disabled={!hasChanges}
-            loading={
-              createMatchMutation.isPending ||
-              updateMatchMutation.isPending ||
-              updateOpponentNameMutation.isPending
-            }
-          >
-            {t("saveButton")}
-          </Button>
-        </Group>
+      {/* Toolbar with Save/Revert buttons */}
+      <Group justify="flex-end" style={{ marginBottom: "1rem" }}>
+        <Button
+          color="red"
+          variant="outline"
+          onClick={handleRevert}
+          disabled={!hasChanges}
+        >
+          {t("revertButton")}
+        </Button>
+        <Button
+          color="green"
+          onClick={handleSave}
+          disabled={!hasChanges}
+          loading={
+            createMatchMutation.isPending ||
+            updateMatchMutation.isPending ||
+            updateOpponentNameMutation.isPending
+          }
+        >
+          {t("saveButton")}
+        </Button>
       </Group>
 
       <Table striped highlightOnHover withTableBorder>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th style={{ width: isEditMode ? "40%" : "50%" }}>
+            <Table.Th style={{ width: isRemoveMode ? "40%" : "50%" }}>
               {t("opponentName")}
             </Table.Th>
             <Table.Th style={{ width: "25%", textAlign: "center" }}>
@@ -354,7 +371,7 @@ export const WinLossTracker = () => {
             <Table.Th style={{ width: "25%", textAlign: "center" }}>
               {t("losses")}
             </Table.Th>
-            {isEditMode && (
+            {isRemoveMode && (
               <Table.Th
                 style={{ width: "10%", textAlign: "center" }}
               ></Table.Th>
@@ -370,7 +387,7 @@ export const WinLossTracker = () => {
               userId={currentUser.id}
               onChange={handleMatchChange}
               onDelete={handleDeleteMatch}
-              isEditMode={isEditMode}
+              isEditMode={isRemoveMode}
               manualSave={true}
             />
           ))}
@@ -383,19 +400,40 @@ export const WinLossTracker = () => {
               userId={currentUser.id}
               onChange={handleMatchChange}
               isGhostRow={true}
-              isEditMode={isEditMode}
+              isEditMode={isRemoveMode}
               manualSave={true}
             />
           ))}
         </Table.Tbody>
       </Table>
 
-      {/* Add new opponent button - outside the table */}
-      <div style={{ textAlign: "center", marginTop: "1rem" }}>
-        <Button color="blue" onClick={handleAddNewMatch} size="md">
-          + {t("addNewOpponent")}
+      {/* Action buttons below the table */}
+      <Group justify="space-between" align="center" style={{ marginTop: "1rem", width: "100%" }}>
+        <Button 
+          variant="outline" 
+          color="red"
+          onClick={handleToggleRemoveMode}
+          size="sm"
+          style={{ minWidth: 'fit-content' }}
+        >
+          <span className="desktop-text">
+            {isRemoveMode ? t("stopRemovingButton") : t("removeOpponentsButton")}
+          </span>
+          <span className="mobile-text">
+            {isRemoveMode ? t("stopRemovingButtonShort") : t("removeOpponentsButtonShort")}
+          </span>
         </Button>
-      </div>
+        
+        <Button 
+          color="blue" 
+          onClick={handleAddNewMatch} 
+          size="sm"
+          style={{ minWidth: 'fit-content' }}
+        >
+          <span className="desktop-text">+ {t("addNewOpponent")}</span>
+          <span className="mobile-text">{t("addNewOpponentShort")}</span>
+        </Button>
+      </Group>
     </Container>
   );
 };
