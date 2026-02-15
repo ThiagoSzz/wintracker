@@ -40,6 +40,11 @@ export const WinLossTracker = () => {
   const { currentUser } = useUserStore();
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
 
+  // Set page title
+  useEffect(() => {
+    document.title = "wintracker | Your results";
+  }, []);
+
   // State management for editable data
   const [editableMatches, setEditableMatches] = useState<EditableMatch[]>([]);
   const [newMatches, setNewMatches] = useState<NewMatch[]>([]);

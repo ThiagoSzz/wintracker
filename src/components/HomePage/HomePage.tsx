@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Container, Title, TextInput, Button, Alert, Text, SimpleGrid } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { Logo } from "../ui";
@@ -23,6 +23,11 @@ export const HomePage = ({ onUserLogin }: HomePageProps) => {
 
   const { setCurrentUser } = useUserStore();
   const createUserMutation = useCreateUser();
+
+  // Set page title
+  useEffect(() => {
+    document.title = "wintracker | Home";
+  }, []);
 
   const handleInitialSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -241,7 +246,7 @@ export const HomePage = ({ onUserLogin }: HomePageProps) => {
           <Alert color="red" style={{ marginBottom: "1rem" }}>
             {error}
           </Alert>
-        )}u 
+        )}
 
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%" }}>
           <Button
@@ -263,7 +268,7 @@ export const HomePage = ({ onUserLogin }: HomePageProps) => {
               whiteSpace: "normal !important",
               wordBreak: "break-word",
               minHeight: "44px",
-              height: "auto !important",
+              height: "auto",
               padding: "8px 16px",
               textOverflow: "visible !important",
               overflow: "visible !important",
