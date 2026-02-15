@@ -1,10 +1,13 @@
 # wintracker
 
-A web application for tracking wins and losses in competitive matches between friends. Built entirely as a vibe-coded project.
+A mobile-first web application for tracking wins and losses in competitive matches between friends. Built entirely as a vibe-coded project.
 
 ## Description
 
 Wintracker allows users to maintain records of their competitive match results against various opponents. Users can create accounts, add opponents, and track their win/loss statistics over time. The application supports editing match history, managing opponent lists, and provides a clean interface for viewing performance data.
+
+<img width="270" height="587" alt="image" src="https://github.com/user-attachments/assets/4a3a3704-911a-485d-b0d3-b37e6aeaa363" />
+<img width="270" height="587" alt="image" src="https://github.com/user-attachments/assets/072f0b40-8c4f-4226-9cc1-e4466b83faea" />
 
 ### Main Workflows
 
