@@ -1,50 +1,70 @@
-# React + TypeScript + Vite
+# wintracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A web application for tracking wins and losses in competitive matches between friends. Built entirely as a vibe-coded project.
 
-Currently, two official plugins are available:
+## Description
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Wintracker allows users to maintain records of their competitive match results against various opponents. Users can create accounts, add opponents, and track their win/loss statistics over time. The application supports editing match history, managing opponent lists, and provides a clean interface for viewing performance data.
 
-## Expanding the ESLint configuration
+### Main Workflows
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+1. **User Registration/Login**: Enter name to create new account or access existing account
+2. **Opponent Management**: Add new opponents to track matches against
+3. **Match Tracking**: Record wins and losses for each opponent
+4. **Data Management**: Edit match results, update opponent names, delete records
+5. **History Viewing**: Review complete match history and statistics
 
-- Configure the top-level `parserOptions` property like this:
+## Tech Stack
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+### Frontend
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
+![Mantine](https://img.shields.io/badge/Mantine-339AF0?style=for-the-badge&logo=mantine&logoColor=white)
+![TanStack Query](https://img.shields.io/badge/TanStack%20Query-FF4154?style=for-the-badge&logo=react%20query&logoColor=white)
+![Zustand](https://img.shields.io/badge/Zustand-FF6B35?style=for-the-badge&logo=zustand&logoColor=white)
+![i18next](https://img.shields.io/badge/i18next-26A69A?style=for-the-badge&logo=i18next&logoColor=white)
+![ESLint](https://img.shields.io/badge/ESLint-4B3263?style=for-the-badge&logo=eslint&logoColor=white)
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### Database
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![Neon](https://img.shields.io/badge/Neon-00E599?style=for-the-badge&logo=neon&logoColor=white)
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+## Architecture Overview
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+### Frontend Architecture
+
+- **Component Structure**: React functional components with TypeScript interfaces
+- **State Management**: 
+  - Global user state managed by Zustand store
+  - Server state managed by TanStack Query for caching and synchronization
+- **Data Flow**: Unidirectional data flow with custom hooks for database operations
+- **UI Components**: Mantine component library with custom styling
+- **Internationalization**: i18next for multi-language support
+- **Routing**: URL-based user persistence without traditional routing
+
+### Database Architecture
+
+- **Database**: PostgreSQL hosted on Neon (serverless)
+- **Tables**: 
+  - `users`: User accounts with unique names
+  - `matches`: Win/loss records linked to users and opponents
+- **Relationships**: Foreign key constraints between users and matches
+- **Indexes**: Optimized queries with indexes on user_id and opponent names
+- **Data Integrity**: Unique constraints and check constraints for data validation
+
+### Data Layer
+
+- **Connection Management**: Singleton pattern for database initialization
+- **Query Abstraction**: Dedicated query modules for users and matches
+- **Type Safety**: TypeScript interfaces for all data structures
+- **Error Handling**: Comprehensive error management with user feedback
+- **Validation**: Input sanitization and validation utilities
+
+
+## Setup
+
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Set up environment variables in `.env.local` (see `.env.template` for reference)
+4. Run development server: `npm run dev`
