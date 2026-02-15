@@ -1,0 +1,58 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #213547;
+  background-color: #ffffff;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+  
+  .mantine-Container-root {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .mantine-Table-table {
+    font-size: 14px;
+  }
+  
+  .mantine-ActionIcon-root {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mantine-Container-root {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  .mantine-Table-th,
+  .mantine-Table-td {
+    padding: 0.5rem;
+  }
+}
