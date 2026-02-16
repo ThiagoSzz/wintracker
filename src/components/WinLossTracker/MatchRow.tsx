@@ -3,7 +3,7 @@ import { TextInput, Table, ActionIcon, Text, Tooltip } from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { CounterButton } from '../ui/CounterButton';
-import type { Match } from '../../types';
+import type { Match } from '../../types/Match';
 
 interface MatchRowProps {
   match: Match;

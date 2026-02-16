@@ -1,9 +1,3 @@
-export interface User {
-  id: number;
-  name: string;
-  created_at: string;
-}
-
 export interface Match {
   id: number;
   user_id: number;
@@ -12,10 +6,6 @@ export interface Match {
   losses: number;
   created_at: string;
   updated_at: string;
-}
-
-export interface CreateUserRequest {
-  name: string;
 }
 
 export interface CreateMatchRequest {

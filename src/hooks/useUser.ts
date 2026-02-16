@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { createUser, getUserByName, checkUserExists } from '../database/queries/users';
-import type { CreateUserRequest } from '../types';
+import type { CreateUserRequest } from '../types/User';
 
 export const useCreateUser = () => {
   return useMutation({

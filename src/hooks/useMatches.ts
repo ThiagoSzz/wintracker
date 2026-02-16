@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getUserMatches, createMatch, updateMatch, updateMatchOpponentName, deleteMatch, deleteMultipleMatches } from '../database/queries/matches';
-import type { CreateMatchRequest, UpdateMatchRequest, Match } from '../types';
+import type { Match, CreateMatchRequest, UpdateMatchRequest } from '../types/Match';
 
 export const useGetUserMatches = (userId: number | null) => {
   return useQuery({
