@@ -61,9 +61,7 @@ export const MatchRow = ({
   }, [matchId, onDelete]);
 
   // Memoized values
-  const rowStyle = useMemo(() => ({ 
-    opacity: isGhostRow ? 0.6 : 1 
-  }), [isGhostRow]);
+  const rowStyle = useMemo(() => ({}), []);
 
   const cellStyle = useMemo(() => ({ 
     textAlign: 'center' as const 
@@ -91,7 +89,7 @@ export const MatchRow = ({
               value={opponentName}
               onChange={handleOpponentNameChange}
               placeholder={isGhostRow ? t('opponentName') : undefined}
-              variant={isGhostRow ? 'filled' : 'default'}
+              variant="default"
               size="sm"
               readOnly={isReadOnly}
             />

@@ -50,7 +50,6 @@ export const WinLossTracker = () => {
   const { t } = useTranslation();
   const { currentUser } = useUserStore();
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
-  const [showUnsavedBanner, setShowUnsavedBanner] = useState(false);
   const [isHelpMode, setIsHelpMode] = useState(false);
   const [currentHelpStep, setCurrentHelpStep] = useState(0);
 
@@ -125,7 +124,6 @@ export const WinLossTracker = () => {
       hasDeletedMatches;
 
     setHasChanges(changes);
-    setShowUnsavedBanner(changes);
   }, [editableMatches, newMatches, originalMatches, deletedMatchIds]);
 
   // Handle changes from MatchRow components
@@ -166,9 +164,6 @@ export const WinLossTracker = () => {
     setDuplicateError(null);
   }, []);
 
-  const closeUnsavedBanner = useCallback(() => {
-    setShowUnsavedBanner(false);
-  }, []);
 
   const toggleHelpMode = useCallback(() => {
     setIsHelpMode((prev) => {
@@ -220,9 +215,15 @@ export const WinLossTracker = () => {
 
   // Remove mode handlers
   const handleToggleRemoveMode = useCallback(() => {
+    // If there are placeholder rows, remove them first instead of toggling remove mode
+    if (newMatches.length > 0) {
+      setNewMatches([]);
+      return;
+    }
+    
     setIsRemoveMode((prev) => !prev);
     // Keep pending deletions when exiting remove mode so save button remains enabled
-  }, []);
+  }, [newMatches.length]);
 
   // Handle marking match for deletion
   const handleDeleteMatch = useCallback((matchId: number) => {
@@ -304,7 +305,6 @@ export const WinLossTracker = () => {
       setHasChanges(false);
       setDuplicateError(null);
       setIsRemoveMode(false);
-      setShowUnsavedBanner(false);
     } catch (error) {
       console.error("Error saving changes:", error);
     }
@@ -328,7 +328,6 @@ export const WinLossTracker = () => {
     setDeletedMatchIds(new Set());
     setHasChanges(false);
     setDuplicateError(null);
-    setShowUnsavedBanner(false);
   }, [originalMatches]);
 
   const { clearUser } = useUserStore();
@@ -388,17 +387,6 @@ export const WinLossTracker = () => {
         </Alert>
       )}
 
-      {showUnsavedBanner && (
-        <Alert
-          color="blue"
-          style={{ marginBottom: "1rem" }}
-          withCloseButton
-          onClose={closeUnsavedBanner}
-          title={t("unsavedChanges")}
-        >
-          {t("unsavedChangesMessage")}
-        </Alert>
-      )}
 
       {/* Toolbar with Help and Save/Revert buttons */}
       <Group justify="space-between" style={{ marginBottom: "1rem" }}>
@@ -450,14 +438,27 @@ export const WinLossTracker = () => {
             multiline
             withArrow
           >
-            <Button
-              color="red"
-              variant="outline"
-              onClick={handleRevert}
-              disabled={!hasChanges}
-            >
-              {t("revertButton")}
-            </Button>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              {hasChanges && (
+                <div
+                  style={{
+                    width: '10px',
+                    height: '10px',
+                    backgroundColor: '#ffd43b',
+                    borderRadius: '50%',
+                    marginRight: '25px',
+                  }}
+                />
+              )}
+              <Button
+                color="red"
+                variant="outline"
+                onClick={handleRevert}
+                disabled={!hasChanges}
+              >
+                {t("revertButton")}
+              </Button>
+            </div>
           </Tooltip>
           <Tooltip
             label={
@@ -569,14 +570,20 @@ export const WinLossTracker = () => {
             style={{ minWidth: "fit-content" }}
           >
             <span className="desktop-text">
-              {isRemoveMode
-                ? t("stopRemovingButton")
-                : t("removeOpponentsButton")}
+              {newMatches.length > 0 
+                ? "Cancel"
+                : isRemoveMode 
+                  ? t("stopRemovingButton") 
+                  : t("removeOpponentsButton")
+              }
             </span>
             <span className="mobile-text">
-              {isRemoveMode
-                ? t("stopRemovingButtonShort")
-                : t("removeOpponentsButtonShort")}
+              {newMatches.length > 0 
+                ? "Cancel"
+                : isRemoveMode 
+                  ? t("stopRemovingButtonShort") 
+                  : t("removeOpponentsButtonShort")
+              }
             </span>
           </Button>
         </Tooltip>
@@ -595,12 +602,24 @@ export const WinLossTracker = () => {
             onClick={handleAddNewMatch}
             size="sm"
             style={{ minWidth: "fit-content" }}
+            disabled={newMatches.length > 0}
           >
             <span className="desktop-text">+ {t("addNewOpponent")}</span>
             <span className="mobile-text">{t("addNewOpponentShort")}</span>
           </Button>
         </Tooltip>
       </Group>
+      
+      {hasChanges && (
+        <div style={{ 
+          textAlign: 'center', 
+          marginTop: '0.5rem',
+          color: '#868e96',
+          fontSize: '12px'
+        }}>
+          Unsaved changes
+        </div>
+      )}
     </Container>
   );
 };
