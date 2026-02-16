@@ -145,10 +145,7 @@ export const WinLossTracker = () => {
         )}
 
         <Toolbar
-          onSave={handleSave}
-          onRevert={resetState}
-          isLoading={isSaving}
-          editableMatchesLength={editableMatches.length}
+          onAddNewMatch={addNewMatch}
           newMatchesLength={newMatches.length}
         />
 
@@ -161,9 +158,11 @@ export const WinLossTracker = () => {
         />
 
         <FooterBar
-          onAddNewMatch={addNewMatch}
+          onSave={handleSave}
+          onRevert={resetState}
+          isLoading={isSaving}
+          editableMatchesLength={editableMatches.length}
           newMatchesLength={newMatches.length}
-          clearNewMatches={clearNewMatches}
         />
       </Container>
     </WinLossProvider>

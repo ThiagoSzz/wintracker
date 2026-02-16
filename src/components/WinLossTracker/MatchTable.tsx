@@ -37,7 +37,7 @@ export const MatchTable = ({
     <Tooltip
       label={currentStepId === 'table' ? currentStepLabel : undefined}
       opened={isHelpMode && currentStepId === 'table'}
-      position="bottom"
+      position="top"
       multiline
       withArrow
     >
