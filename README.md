@@ -8,7 +8,6 @@ Wintracker allows users to maintain records of their competitive match results a
 
 <img width="243" height="528" alt="image" src="https://github.com/user-attachments/assets/4a3a3704-911a-485d-b0d3-b37e6aeaa363" />
 <img width="243" height="528" alt="image" src="https://github.com/user-attachments/assets/5262628e-90a7-43ae-acb3-200dea75f514" />
-<img width="243" height="528" alt="image" src="https://github.com/user-attachments/assets/9c733af5-2b9f-4f5f-ba48-4d76f4a3572e" />
 <img width="243" height="528" alt="image" src="https://github.com/user-attachments/assets/c73aa5fe-5f6d-4c1a-bde1-cac28ac292e1" />
 
 ### Main Workflows
