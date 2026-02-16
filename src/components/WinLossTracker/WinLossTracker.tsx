@@ -42,6 +42,7 @@ export const WinLossTracker = () => {
 
   const {
     isHelpMode,
+    currentHelpStep,
     currentStep,
     totalSteps,
     toggleHelpMode,
@@ -156,7 +157,7 @@ export const WinLossTracker = () => {
       <Toolbar
         isHelpMode={isHelpMode}
         onToggleHelp={toggleHelpMode}
-        currentHelpStep={0}
+        currentHelpStep={currentHelpStep}
         totalHelpSteps={totalSteps}
         onPrevHelpStep={prevHelpStep}
         onNextHelpStep={nextHelpStep}
