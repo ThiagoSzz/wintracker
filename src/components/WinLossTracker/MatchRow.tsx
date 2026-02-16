@@ -1,21 +1,33 @@
 import { useCallback, useMemo } from 'react';
-import { TextInput, Table, ActionIcon, Text } from '@mantine/core';
+import { TextInput, Table, ActionIcon, Text, Tooltip } from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { CounterButton } from '../ui/CounterButton';
 import type { Match } from '../../types';
 
 interface MatchRowProps {
-  match?: Match | { id: string | number; opponent_name: string; wins: number; losses: number; isNew?: boolean };
+  match: Match;
   userId: number;
-  isGhostRow?: boolean;
   onChange?: (matchId: number | string, field: string, value: string | number) => void;
   onDelete?: (matchId: number) => void;
   isEditMode?: boolean;
+  isGhostRow?: boolean;
   manualSave?: boolean;
+  isFirstRow?: boolean;
+  isHelpMode?: boolean;
+  currentHelpStep?: string;
 }
 
-export const MatchRow = ({ match, isGhostRow = false, onChange, onDelete, isEditMode = false }: MatchRowProps) => {
+export const MatchRow = ({ 
+  match, 
+  isGhostRow = false, 
+  onChange, 
+  onDelete, 
+  isEditMode = false, 
+  isFirstRow = false, 
+  isHelpMode = false,
+  currentHelpStep
+}: MatchRowProps) => {
   const { t } = useTranslation();
 
   const matchId = match?.id;
@@ -68,14 +80,22 @@ export const MatchRow = ({ match, isGhostRow = false, onChange, onDelete, isEdit
             {opponentName}
           </Text>
         ) : (
-          <TextInput
-            value={opponentName}
-            onChange={handleOpponentNameChange}
-            placeholder={isGhostRow ? t('opponentName') : undefined}
-            variant={isGhostRow ? 'filled' : 'default'}
-            size="sm"
-            readOnly={isReadOnly}
-          />
+          <Tooltip 
+            label={currentHelpStep === 'opponentField' ? t("helpTooltipOpponentField") : undefined} 
+            opened={isHelpMode && isFirstRow && currentHelpStep === 'opponentField'}
+            position="bottom"
+            multiline
+            withArrow
+          >
+            <TextInput
+              value={opponentName}
+              onChange={handleOpponentNameChange}
+              placeholder={isGhostRow ? t('opponentName') : undefined}
+              variant={isGhostRow ? 'filled' : 'default'}
+              size="sm"
+              readOnly={isReadOnly}
+            />
+          </Tooltip>
         )}
       </Table.Td>
       <Table.Td style={cellStyle}>
@@ -88,6 +108,8 @@ export const MatchRow = ({ match, isGhostRow = false, onChange, onDelete, isEdit
             value={wins}
             onChange={handleWinsChange}
             disabled={counterDisabled}
+            tooltipLabel={currentHelpStep === 'counterButtons' ? t("helpTooltipCounterButtons") : undefined}
+            showTooltip={isHelpMode && isFirstRow && currentHelpStep === 'counterButtons'}
           />
         )}
       </Table.Td>

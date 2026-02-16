@@ -7,7 +7,15 @@ import {
   Alert,
   Group,
   Button,
+  Tooltip,
+  ActionIcon,
+  Text,
 } from "@mantine/core";
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconHelpHexagon,
+} from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 import { Logo } from "../ui";
 import {
@@ -27,11 +35,14 @@ interface EditableMatch extends Match {
   isNew?: boolean;
 }
 
-interface NewMatch {
+interface NewMatch extends Omit<
+  Match,
+  "id" | "user_id" | "created_at" | "updated_at"
+> {
   id: string; // Temporary ID for new matches
-  opponent_name: string;
-  wins: number;
-  losses: number;
+  user_id?: number; // Optional for type compatibility
+  created_at?: string; // Optional for type compatibility
+  updated_at?: string; // Optional for type compatibility
   isNew: true;
 }
 
@@ -40,6 +51,8 @@ export const WinLossTracker = () => {
   const { currentUser } = useUserStore();
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
   const [showUnsavedBanner, setShowUnsavedBanner] = useState(false);
+  const [isHelpMode, setIsHelpMode] = useState(false);
+  const [currentHelpStep, setCurrentHelpStep] = useState(0);
 
   // Set page title
   useEffect(() => {
@@ -96,16 +109,20 @@ export const WinLossTracker = () => {
     });
 
     // Only consider new matches as changes if they have actual data entered
-    const hasNewMatchChanges = newMatches.some(match => 
-      match.opponent_name.trim().length > 0 || match.wins > 0 || match.losses > 0
+    const hasNewMatchChanges = newMatches.some(
+      (match) =>
+        match.opponent_name.trim().length > 0 ||
+        match.wins > 0 ||
+        match.losses > 0,
     );
     const hasLengthChanges = editableMatches.length !== originalMatches.length;
     const hasDeletedMatches = deletedMatchIds.size > 0;
 
-    const changes = hasEditChanges ||
-        hasNewMatchChanges ||
-        hasLengthChanges ||
-        hasDeletedMatches;
+    const changes =
+      hasEditChanges ||
+      hasNewMatchChanges ||
+      hasLengthChanges ||
+      hasDeletedMatches;
 
     setHasChanges(changes);
     setShowUnsavedBanner(changes);
@@ -152,6 +169,54 @@ export const WinLossTracker = () => {
   const closeUnsavedBanner = useCallback(() => {
     setShowUnsavedBanner(false);
   }, []);
+
+  const toggleHelpMode = useCallback(() => {
+    setIsHelpMode((prev) => {
+      if (!prev) {
+        setCurrentHelpStep(0); // Start from first step when enabling
+      }
+      return !prev;
+    });
+  }, []);
+
+  const nextHelpStep = useCallback(() => {
+    setCurrentHelpStep((prev) => {
+      const hasFirstRow = editableMatches.length > 0 || newMatches.length > 0;
+      const totalSteps = hasFirstRow ? 7 : 5; // 7 with first row, 5 without
+      return prev < totalSteps - 1 ? prev + 1 : prev;
+    });
+  }, [editableMatches.length, newMatches.length]);
+
+  const prevHelpStep = useCallback(() => {
+    setCurrentHelpStep((prev) => (prev > 0 ? prev - 1 : prev));
+  }, []);
+
+  // Define help steps based on usage order
+  const getHelpSteps = useMemo(() => {
+    const hasFirstRow = editableMatches.length > 0 || newMatches.length > 0;
+    const steps = [
+      { id: "table", label: t("helpTooltipTable") },
+      { id: "addButton", label: t("helpTooltipAddButton") },
+    ];
+
+    if (hasFirstRow) {
+      steps.push(
+        { id: "opponentField", label: t("helpTooltipOpponentField") },
+        { id: "counterButtons", label: t("helpTooltipCounterButtons") },
+      );
+    }
+
+    steps.push(
+      { id: "saveButton", label: t("helpTooltipSave") },
+      { id: "revertButton", label: t("helpTooltipRevert") },
+      { id: "removeButton", label: t("helpTooltipRemoveButton") },
+    );
+
+    return steps;
+  }, [editableMatches.length, newMatches.length, t]);
+
+  const currentStep = getHelpSteps[currentHelpStep];
+  const totalSteps = getHelpSteps.length;
 
   // Remove mode handlers
   const handleToggleRemoveMode = useCallback(() => {
@@ -296,7 +361,7 @@ export const WinLossTracker = () => {
       <LoadingOverlay visible={isLoading} />
 
       <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-        <Logo 
+        <Logo
           order={2}
           onClick={handleLogoClick}
           interactive={true}
@@ -335,104 +400,206 @@ export const WinLossTracker = () => {
         </Alert>
       )}
 
-      {/* Toolbar with Save/Revert buttons */}
-      <Group justify="flex-end" style={{ marginBottom: "1rem" }}>
-        <Button
-          color="red"
-          variant="outline"
-          onClick={handleRevert}
-          disabled={!hasChanges}
-        >
-          {t("revertButton")}
-        </Button>
-        <Button
-          color="green"
-          onClick={handleSave}
-          disabled={!hasChanges}
-          loading={
-            createMatchMutation.isPending ||
-            updateMatchMutation.isPending ||
-            updateOpponentNameMutation.isPending
-          }
-        >
-          {t("saveButton")}
-        </Button>
+      {/* Toolbar with Help and Save/Revert buttons */}
+      <Group justify="space-between" style={{ marginBottom: "1rem" }}>
+        <Group gap="xs">
+          <Tooltip label={t("helpButton")}>
+            <ActionIcon
+              size="lg"
+              onClick={toggleHelpMode}
+              color={isHelpMode ? "blue" : "gray"}
+            >
+              <IconHelpHexagon size={20} strokeWidth={1.4} />
+            </ActionIcon>
+          </Tooltip>
+
+          {isHelpMode && (
+            <Group gap={4}>
+              <ActionIcon
+                variant="outline"
+                onClick={prevHelpStep}
+                disabled={currentHelpStep === 0}
+                size="md"
+              >
+                <IconChevronLeft size={16} />
+              </ActionIcon>
+
+              <Text size="sm" style={{ minWidth: "40px", textAlign: "center" }}>
+                {currentHelpStep + 1}/{totalSteps}
+              </Text>
+
+              <ActionIcon
+                variant="outline"
+                onClick={nextHelpStep}
+                disabled={currentHelpStep === totalSteps - 1}
+                size="md"
+              >
+                <IconChevronRight size={16} />
+              </ActionIcon>
+            </Group>
+          )}
+        </Group>
+
+        <Group>
+          <Tooltip
+            label={
+              currentStep?.id === "revertButton" ? currentStep.label : undefined
+            }
+            opened={isHelpMode && currentStep?.id === "revertButton"}
+            position="bottom"
+            multiline
+            withArrow
+          >
+            <Button
+              color="red"
+              variant="outline"
+              onClick={handleRevert}
+              disabled={!hasChanges}
+            >
+              {t("revertButton")}
+            </Button>
+          </Tooltip>
+          <Tooltip
+            label={
+              currentStep?.id === "saveButton" ? currentStep.label : undefined
+            }
+            opened={isHelpMode && currentStep?.id === "saveButton"}
+            position="top"
+            multiline
+            withArrow
+          >
+            <Button
+              color="green"
+              onClick={handleSave}
+              disabled={!hasChanges}
+              loading={
+                createMatchMutation.isPending ||
+                updateMatchMutation.isPending ||
+                updateOpponentNameMutation.isPending
+              }
+            >
+              {t("saveButton")}
+            </Button>
+          </Tooltip>
+        </Group>
       </Group>
 
-      <Table striped highlightOnHover withTableBorder>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th style={{ width: isRemoveMode ? "40%" : "50%" }}>
-              {t("opponentName")}
-            </Table.Th>
-            <Table.Th style={{ width: "25%", textAlign: "center" }}>
-              {t("wins")}
-            </Table.Th>
-            <Table.Th style={{ width: "25%", textAlign: "center" }}>
-              {t("losses")}
-            </Table.Th>
-            {isRemoveMode && (
-              <Table.Th
-                style={{ width: "10%", textAlign: "center" }}
-              ></Table.Th>
-            )}
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {/* Render existing matches */}
-          {editableMatches.map((match) => (
-            <MatchRow
-              key={match.id}
-              match={match}
-              userId={currentUser.id}
-              onChange={handleMatchChange}
-              onDelete={handleDeleteMatch}
-              isEditMode={isRemoveMode}
-              manualSave={true}
-            />
-          ))}
+      <Tooltip
+        label={currentStep?.id === "table" ? currentStep.label : undefined}
+        opened={isHelpMode && currentStep?.id === "table"}
+        position="bottom"
+        multiline
+        withArrow
+      >
+        <Table striped highlightOnHover withTableBorder>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th style={{ width: isRemoveMode ? "40%" : "50%" }}>
+                {t("opponentName")}
+              </Table.Th>
+              <Table.Th style={{ width: "25%", textAlign: "center" }}>
+                {t("wins")}
+              </Table.Th>
+              <Table.Th style={{ width: "25%", textAlign: "center" }}>
+                {t("losses")}
+              </Table.Th>
+              {isRemoveMode && (
+                <Table.Th
+                  style={{ width: "10%", textAlign: "center" }}
+                ></Table.Th>
+              )}
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {/* Render existing matches */}
+            {editableMatches.map((match, index) => (
+              <MatchRow
+                key={match.id}
+                match={match}
+                userId={currentUser.id}
+                onChange={handleMatchChange}
+                onDelete={handleDeleteMatch}
+                isEditMode={isRemoveMode}
+                manualSave={true}
+                isFirstRow={index === 0}
+                isHelpMode={isHelpMode}
+                currentHelpStep={currentStep?.id}
+              />
+            ))}
 
-          {/* Render new matches */}
-          {newMatches.map((match) => (
-            <MatchRow
-              key={match.id}
-              match={match}
-              userId={currentUser.id}
-              onChange={handleMatchChange}
-              isGhostRow={true}
-              isEditMode={isRemoveMode}
-              manualSave={true}
-            />
-          ))}
-        </Table.Tbody>
-      </Table>
+            {/* Render new matches */}
+            {newMatches.map((match, index) => (
+              <MatchRow
+                key={match.id}
+                match={match as unknown as Match}
+                userId={currentUser.id}
+                onChange={handleMatchChange}
+                isGhostRow={true}
+                isEditMode={isRemoveMode}
+                manualSave={true}
+                isFirstRow={editableMatches.length === 0 && index === 0}
+                isHelpMode={isHelpMode}
+                currentHelpStep={currentStep?.id}
+              />
+            ))}
+          </Table.Tbody>
+        </Table>
+      </Tooltip>
 
       {/* Action buttons below the table */}
-      <Group justify="space-between" align="center" style={{ marginTop: "1rem", width: "100%" }}>
-        <Button 
-          variant="outline" 
-          color="red"
-          onClick={handleToggleRemoveMode}
-          size="sm"
-          style={{ minWidth: 'fit-content' }}
+      <Group
+        justify="space-between"
+        align="center"
+        style={{ marginTop: "1rem", width: "100%" }}
+      >
+        <Tooltip
+          label={
+            currentStep?.id === "removeButton" ? currentStep.label : undefined
+          }
+          opened={isHelpMode && currentStep?.id === "removeButton"}
+          position="top"
+          multiline
+          withArrow
         >
-          <span className="desktop-text">
-            {isRemoveMode ? t("stopRemovingButton") : t("removeOpponentsButton")}
-          </span>
-          <span className="mobile-text">
-            {isRemoveMode ? t("stopRemovingButtonShort") : t("removeOpponentsButtonShort")}
-          </span>
-        </Button>
-        
-        <Button 
-          color="blue" 
-          onClick={handleAddNewMatch} 
-          size="sm"
-          style={{ minWidth: 'fit-content' }}
+          <Button
+            variant="outline"
+            color="red"
+            onClick={handleToggleRemoveMode}
+            size="sm"
+            style={{ minWidth: "fit-content" }}
+          >
+            <span className="desktop-text">
+              {isRemoveMode
+                ? t("stopRemovingButton")
+                : t("removeOpponentsButton")}
+            </span>
+            <span className="mobile-text">
+              {isRemoveMode
+                ? t("stopRemovingButtonShort")
+                : t("removeOpponentsButtonShort")}
+            </span>
+          </Button>
+        </Tooltip>
+
+        <Tooltip
+          label={
+            currentStep?.id === "addButton" ? currentStep.label : undefined
+          }
+          opened={isHelpMode && currentStep?.id === "addButton"}
+          position="top"
+          multiline
+          withArrow
         >
-          <span className="desktop-text">+ {t("addNewOpponent")}</span>
-          <span className="mobile-text">{t("addNewOpponentShort")}</span>
-        </Button>
+          <Button
+            color="blue"
+            onClick={handleAddNewMatch}
+            size="sm"
+            style={{ minWidth: "fit-content" }}
+          >
+            <span className="desktop-text">+ {t("addNewOpponent")}</span>
+            <span className="mobile-text">{t("addNewOpponentShort")}</span>
+          </Button>
+        </Tooltip>
       </Group>
     </Container>
   );
