@@ -5,12 +5,12 @@ import { Logo } from "../ui/Logo";
 import { ErrorAlert } from "../ui/ErrorAlert";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import { useMatchesState } from "../../hooks/useMatchesState";
-import { useHelpMode } from "../../hooks/useHelpMode";
 import { useRemoveMode } from "../../hooks/useRemoveMode";
 import { useDuplicateValidation } from "../../hooks/useDuplicateValidation";
 import { useMatchOperations } from "../../hooks/useMatchOperations";
 import { useGetUserMatches } from "../../hooks/useMatches";
 import { useUserStore } from "../../store/userStore";
+import { WinLossProvider } from "./WinLossContext";
 import { Toolbar } from "./Toolbar";
 import { MatchTable } from "./MatchTable";
 import { FooterBar } from "./FooterBar";
@@ -18,7 +18,7 @@ import { FooterBar } from "./FooterBar";
 export const WinLossTracker = () => {
   const { t } = useTranslation();
   const { currentUser, clearUser } = useUserStore();
-  
+
   usePageTitle("wintracker | Your results");
 
   const {
@@ -40,29 +40,13 @@ export const WinLossTracker = () => {
     clearNewMatches,
   } = useMatchesState(originalMatches);
 
-  const {
-    isHelpMode,
-    currentHelpStep,
-    currentStep,
-    totalSteps,
-    toggleHelpMode,
-    nextHelpStep,
-    prevHelpStep,
-  } = useHelpMode(editableMatches.length, newMatches.length);
-
   const { isRemoveMode, toggleRemoveMode, exitRemoveMode } = useRemoveMode();
 
-  const { duplicateError, checkDuplicate, clearDuplicateError } = useDuplicateValidation(originalMatches);
+  const { duplicateError, checkDuplicate, clearDuplicateError } =
+    useDuplicateValidation(originalMatches);
 
   const { saveChanges, isLoading: isSaving } = useMatchOperations();
 
-  const handleToggleRemoveMode = useCallback(() => {
-    if (newMatches.length > 0) {
-      clearNewMatches();
-      return;
-    }
-    toggleRemoveMode();
-  }, [newMatches.length, clearNewMatches, toggleRemoveMode]);
 
   const handleSave = useCallback(async () => {
     if (!currentUser) return;
@@ -77,7 +61,7 @@ export const WinLossTracker = () => {
         checkDuplicate,
         () => {
           clearNewMatches();
-        }
+        },
       );
 
       if (success) {
@@ -119,78 +103,69 @@ export const WinLossTracker = () => {
   }
 
   return (
-    <Container
-      size="md"
-      style={{
-        paddingTop: "2rem",
-        paddingBottom: "2rem",
-        position: "relative",
-      }}
+    <WinLossProvider 
+      hasChanges={hasChanges}
+      isRemoveMode={isRemoveMode}
+      toggleRemoveMode={toggleRemoveMode}
+      exitRemoveMode={exitRemoveMode}
     >
-      <LoadingOverlay visible={isLoading} />
+      <Container
+        size="md"
+        style={{
+          paddingTop: "2rem",
+          paddingBottom: "2rem",
+          position: "relative",
+        }}
+      >
+        <LoadingOverlay visible={isLoading} />
 
-      <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-        <Logo
-          order={2}
-          onClick={handleLogoClick}
-          interactive={true}
-          style={{ marginBottom: "0.5rem" }}
+        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+          <Logo
+            order={2}
+            onClick={handleLogoClick}
+            interactive={true}
+            style={{ marginBottom: "0.5rem" }}
+          />
+          <Title
+            order={3}
+            size="h4"
+            style={{ fontWeight: "normal", color: "#666" }}
+          >
+            {currentUser.name}
+          </Title>
+        </div>
+
+        {duplicateError && (
+          <ErrorAlert
+            message={`${t("duplicateOpponentError")}: "${duplicateError}"`}
+            title={t("duplicateOpponentError")}
+            onClose={clearDuplicateError}
+            style={{ marginBottom: "1rem" }}
+          />
+        )}
+
+        <Toolbar
+          onSave={handleSave}
+          onRevert={resetState}
+          isLoading={isSaving}
+          editableMatchesLength={editableMatches.length}
+          newMatchesLength={newMatches.length}
         />
-        <Title
-          order={3}
-          size="h4"
-          style={{ fontWeight: "normal", color: "#666" }}
-        >
-          {currentUser.name}
-        </Title>
-      </div>
 
-      {duplicateError && (
-        <ErrorAlert
-          message={`${t("duplicateOpponentError")}: "${duplicateError}"`}
-          title={t("duplicateOpponentError")}
-          onClose={clearDuplicateError}
-          style={{ marginBottom: "1rem" }}
+        <MatchTable
+          editableMatches={editableMatches}
+          newMatches={newMatches}
+          currentUser={currentUser}
+          onChange={handleMatchChange}
+          onDelete={deleteMatch}
         />
-      )}
 
-      <Toolbar
-        isHelpMode={isHelpMode}
-        onToggleHelp={toggleHelpMode}
-        currentHelpStep={currentHelpStep}
-        totalHelpSteps={totalSteps}
-        onPrevHelpStep={prevHelpStep}
-        onNextHelpStep={nextHelpStep}
-        hasChanges={hasChanges}
-        onSave={handleSave}
-        onRevert={resetState}
-        isLoading={isSaving}
-        currentStepId={currentStep?.id}
-        currentStepLabel={currentStep?.label}
-      />
-
-      <MatchTable
-        editableMatches={editableMatches}
-        newMatches={newMatches}
-        currentUser={currentUser}
-        onChange={handleMatchChange}
-        onDelete={deleteMatch}
-        isRemoveMode={isRemoveMode}
-        isHelpMode={isHelpMode}
-        currentStepId={currentStep?.id}
-        currentStepLabel={currentStep?.label}
-      />
-
-      <FooterBar
-        onToggleRemoveMode={handleToggleRemoveMode}
-        onAddNewMatch={addNewMatch}
-        isRemoveMode={isRemoveMode}
-        newMatchesLength={newMatches.length}
-        hasChanges={hasChanges}
-        isHelpMode={isHelpMode}
-        currentStepId={currentStep?.id}
-        currentStepLabel={currentStep?.label}
-      />
-    </Container>
+        <FooterBar
+          onAddNewMatch={addNewMatch}
+          newMatchesLength={newMatches.length}
+          clearNewMatches={clearNewMatches}
+        />
+      </Container>
+    </WinLossProvider>
   );
 };

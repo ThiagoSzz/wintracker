@@ -1,37 +1,60 @@
 import { Group, Button, Tooltip, ActionIcon, Text } from '@mantine/core';
 import { IconHelpHexagon, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
+import { useHelpMode } from '../../hooks/useHelpMode';
+import { useWinLossContext } from './WinLossContext';
 
 interface ToolbarProps {
-  isHelpMode: boolean;
-  onToggleHelp: () => void;
-  currentHelpStep: number;
-  totalHelpSteps: number;
-  onPrevHelpStep: () => void;
-  onNextHelpStep: () => void;
-  hasChanges: boolean;
   onSave: () => void;
   onRevert: () => void;
   isLoading: boolean;
-  currentStepId?: string;
-  currentStepLabel?: string;
+  editableMatchesLength: number;
+  newMatchesLength: number;
 }
 
 export const Toolbar = ({
-  isHelpMode,
-  onToggleHelp,
-  currentHelpStep,
-  totalHelpSteps,
-  onPrevHelpStep,
-  onNextHelpStep,
-  hasChanges,
   onSave,
   onRevert,
   isLoading,
-  currentStepId,
-  currentStepLabel,
+  editableMatchesLength,
+  newMatchesLength,
 }: ToolbarProps) => {
   const { t } = useTranslation();
+  const { hasChanges, isHelpMode, currentStep, setHelpMode } = useWinLossContext();
+  
+  const {
+    currentHelpStep,
+    currentStep: helpStep,
+    totalSteps,
+    toggleHelpMode: toggleHelpModeLocal,
+    nextHelpStep,
+    prevHelpStep,
+  } = useHelpMode(editableMatchesLength, newMatchesLength);
+  
+  const currentStepId = currentStep?.id;
+  const currentStepLabel = currentStep?.label;
+
+  // Sync help step changes with context
+  useEffect(() => {
+    if (isHelpMode && helpStep) {
+      setHelpMode(true, helpStep);
+    }
+  }, [helpStep, isHelpMode, setHelpMode]);
+
+  const toggleHelpMode = () => {
+    const newHelpMode = !isHelpMode;
+    toggleHelpModeLocal();
+    setHelpMode(newHelpMode, newHelpMode ? helpStep : undefined);
+  };
+
+  const handleNextHelpStep = () => {
+    nextHelpStep();
+  };
+
+  const handlePrevHelpStep = () => {
+    prevHelpStep();
+  };
 
   return (
     <Group justify="space-between" style={{ marginBottom: '1rem' }}>
@@ -39,7 +62,7 @@ export const Toolbar = ({
         <Tooltip label={t('helpButton')}>
           <ActionIcon
             size="lg"
-            onClick={onToggleHelp}
+            onClick={toggleHelpMode}
             color={isHelpMode ? 'blue' : 'gray'}
           >
             <IconHelpHexagon size={20} strokeWidth={1.4} />
@@ -50,7 +73,7 @@ export const Toolbar = ({
           <Group gap={4}>
             <ActionIcon
               variant="outline"
-              onClick={onPrevHelpStep}
+              onClick={handlePrevHelpStep}
               disabled={currentHelpStep === 0}
               size="md"
             >
@@ -58,13 +81,13 @@ export const Toolbar = ({
             </ActionIcon>
 
             <Text size="sm" style={{ minWidth: '40px', textAlign: 'center' }}>
-              {currentHelpStep + 1}/{totalHelpSteps}
+              {currentHelpStep + 1}/{totalSteps}
             </Text>
 
             <ActionIcon
               variant="outline"
-              onClick={onNextHelpStep}
-              disabled={currentHelpStep === totalHelpSteps - 1}
+              onClick={handleNextHelpStep}
+              disabled={currentHelpStep === totalSteps - 1}
               size="md"
             >
               <IconChevronRight size={16} />

@@ -1,6 +1,7 @@
 import { Table, Tooltip } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { MatchRow } from './MatchRow';
+import { useWinLossContext } from './WinLossContext';
 import type { Match } from '../../types/Match';
 
 interface NewMatch {
@@ -17,10 +18,6 @@ interface MatchTableProps {
   currentUser: { id: number };
   onChange: (matchId: number | string, field: string, value: string | number) => void;
   onDelete: (matchId: number) => void;
-  isRemoveMode: boolean;
-  isHelpMode: boolean;
-  currentStepId?: string;
-  currentStepLabel?: string;
 }
 
 export const MatchTable = ({
@@ -29,12 +26,12 @@ export const MatchTable = ({
   currentUser,
   onChange,
   onDelete,
-  isRemoveMode,
-  isHelpMode,
-  currentStepId,
-  currentStepLabel,
 }: MatchTableProps) => {
   const { t } = useTranslation();
+  const { isRemoveMode, isHelpMode, currentStep } = useWinLossContext();
+  
+  const currentStepId = currentStep?.id;
+  const currentStepLabel = currentStep?.label;
 
   return (
     <Tooltip

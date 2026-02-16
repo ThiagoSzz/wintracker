@@ -12,16 +12,18 @@ export const useUserAuth = () => {
   const [state, setState] = useState<AuthState>('input');
   const [error, setError] = useState<string | null>(null);
   const [foundUser, setFoundUser] = useState<User | null>(null);
+  const [sanitizedName, setSanitizedName] = useState<string>('');
 
   const { setCurrentUser } = useUserStore();
   const createUserMutation = useCreateUser();
 
-  const checkUser = useCallback(async (sanitizedName: string) => {
+  const checkUser = useCallback(async (inputSanitizedName: string) => {
     setState('processing');
     setError(null);
+    setSanitizedName(inputSanitizedName);
 
     try {
-      const user = await getUserByName(sanitizedName);
+      const user = await getUserByName(inputSanitizedName);
       
       if (user) {
         setFoundUser(user);
@@ -65,6 +67,7 @@ export const useUserAuth = () => {
     state,
     error,
     foundUser,
+    sanitizedName,
     isLoading,
     checkUser,
     confirmExistingUser,

@@ -1,39 +1,44 @@
-import { Group, Button, Tooltip } from '@mantine/core';
-import { useTranslation } from 'react-i18next';
+import { Group, Button, Tooltip } from "@mantine/core";
+import { useTranslation } from "react-i18next";
+import { useWinLossContext } from "./WinLossContext";
 
 interface FooterBarProps {
-  onToggleRemoveMode: () => void;
   onAddNewMatch: () => void;
-  isRemoveMode: boolean;
   newMatchesLength: number;
-  hasChanges: boolean;
-  isHelpMode: boolean;
-  currentStepId?: string;
-  currentStepLabel?: string;
+  clearNewMatches: () => void;
 }
 
 export const FooterBar = ({
-  onToggleRemoveMode,
   onAddNewMatch,
-  isRemoveMode,
   newMatchesLength,
-  hasChanges,
-  isHelpMode,
-  currentStepId,
-  currentStepLabel,
+  clearNewMatches,
 }: FooterBarProps) => {
   const { t } = useTranslation();
+  const { hasChanges, isHelpMode, currentStep, isRemoveMode, toggleRemoveMode } = useWinLossContext();
+  
+  const currentStepId = currentStep?.id;
+  const currentStepLabel = currentStep?.label;
+
+  const handleToggleRemoveMode = () => {
+    if (newMatchesLength > 0) {
+      clearNewMatches();
+      return;
+    }
+    toggleRemoveMode();
+  };
 
   return (
     <>
       <Group
         justify="space-between"
         align="center"
-        style={{ marginTop: '1rem', width: '100%' }}
+        style={{ marginTop: "1rem", width: "100%" }}
       >
         <Tooltip
-          label={currentStepId === 'removeButton' ? currentStepLabel : undefined}
-          opened={isHelpMode && currentStepId === 'removeButton'}
+          label={
+            currentStepId === "removeButton" ? currentStepLabel : undefined
+          }
+          opened={isHelpMode && currentStepId === "removeButton"}
           position="top"
           multiline
           withArrow
@@ -41,32 +46,30 @@ export const FooterBar = ({
           <Button
             variant="outline"
             color="red"
-            onClick={onToggleRemoveMode}
+            onClick={handleToggleRemoveMode}
             size="sm"
-            style={{ minWidth: 'fit-content' }}
+            style={{ minWidth: "fit-content" }}
           >
             <span className="desktop-text">
-              {newMatchesLength > 0 
+              {newMatchesLength > 0
                 ? "Cancel"
-                : isRemoveMode 
-                  ? t("stopRemovingButton") 
-                  : t("removeOpponentsButton")
-              }
+                : isRemoveMode
+                  ? t("stopRemovingButton")
+                  : t("removeOpponentsButton")}
             </span>
             <span className="mobile-text">
-              {newMatchesLength > 0 
+              {newMatchesLength > 0
                 ? "Cancel"
-                : isRemoveMode 
-                  ? t("stopRemovingButtonShort") 
-                  : t("removeOpponentsButtonShort")
-              }
+                : isRemoveMode
+                  ? t("stopRemovingButtonShort")
+                  : t("removeOpponentsButtonShort")}
             </span>
           </Button>
         </Tooltip>
 
         <Tooltip
-          label={currentStepId === 'addButton' ? currentStepLabel : undefined}
-          opened={isHelpMode && currentStepId === 'addButton'}
+          label={currentStepId === "addButton" ? currentStepLabel : undefined}
+          opened={isHelpMode && currentStepId === "addButton"}
           position="top"
           multiline
           withArrow
@@ -75,7 +78,7 @@ export const FooterBar = ({
             color="blue"
             onClick={onAddNewMatch}
             size="sm"
-            style={{ minWidth: 'fit-content' }}
+            style={{ minWidth: "fit-content" }}
             disabled={newMatchesLength > 0}
           >
             <span className="desktop-text">+ {t("addNewOpponent")}</span>
@@ -83,14 +86,16 @@ export const FooterBar = ({
           </Button>
         </Tooltip>
       </Group>
-      
+
       {hasChanges && (
-        <div style={{ 
-          textAlign: 'center', 
-          marginTop: '0.5rem',
-          color: '#868e96',
-          fontSize: '12px'
-        }}>
+        <div
+          style={{
+            textAlign: "center",
+            marginTop: "0.5rem",
+            color: "#868e96",
+            fontSize: "12px",
+          }}
+        >
           Unsaved changes
         </div>
       )}
