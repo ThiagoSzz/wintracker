@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Match } from '../types/Match';
 
 interface EditableMatch extends Match {
@@ -19,9 +19,21 @@ export const useMatchesState = (originalMatches: Match[]) => {
   const [newMatches, setNewMatches] = useState<NewMatch[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
   const [deletedMatchIds, setDeletedMatchIds] = useState<Set<number>>(new Set());
+  const initializedRef = useRef(false);
 
   useEffect(() => {
-    setEditableMatches([...originalMatches]);
+    if (!initializedRef.current) {
+      setEditableMatches([...originalMatches]);
+      initializedRef.current = true;
+    } else {
+      // Only update if the actual data changed (deep comparison of IDs)
+      const currentIds = editableMatches.map(m => m.id).join(',');
+      const newIds = originalMatches.map(m => m.id).join(',');
+      
+      if (currentIds !== newIds) {
+        setEditableMatches([...originalMatches]);
+      }
+    }
   }, [originalMatches]);
 
   useEffect(() => {
