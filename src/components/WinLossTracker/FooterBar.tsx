@@ -71,7 +71,7 @@ export const FooterBar = ({
           </Tooltip>
 
           {isHelpMode && (
-            <Group gap={4}>
+            <Group gap={0}>
               <ActionIcon
                 variant="outline"
                 onClick={handlePrevHelpStep}
