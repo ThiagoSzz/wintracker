@@ -7,6 +7,8 @@ export const useUrlParams = () => {
   useTranslation();
 
   const updateUrlParams = useCallback((params: Record<string, string | null>) => {
+    if (typeof window === 'undefined') return; // SSR safety
+    
     const urlParams = new URLSearchParams(window.location.search);
     
     Object.entries(params).forEach(([key, value]) => {
@@ -25,6 +27,8 @@ export const useUrlParams = () => {
   }, []);
 
   const getUrlParam = useCallback((key: string): string | null => {
+    if (typeof window === 'undefined') return null; // SSR safety
+    
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(key);
   }, []);
@@ -38,12 +42,23 @@ export const useUrlParams = () => {
   }, [updateUrlParams]);
 
   const redirectToHome = useCallback(() => {
+    if (typeof window === 'undefined') return; // SSR safety
+    
     if (window.location.pathname === '/') {
       window.history.replaceState({}, '', '/home' + window.location.search);
     }
   }, []);
 
+  const forceRedirectToHome = useCallback(() => {
+    if (typeof window === 'undefined') return; // SSR safety
+    
+    // Clear all URL parameters and redirect to home
+    window.history.replaceState({}, '', '/home');
+  }, []);
+
   const setPagePath = useCallback((path: string) => {
+    if (typeof window === 'undefined') return; // SSR safety
+    
     const urlParams = new URLSearchParams(window.location.search);
     const newUrl = urlParams.toString() 
       ? `${path}?${urlParams.toString()}`
@@ -55,20 +70,38 @@ export const useUrlParams = () => {
   }, []);
 
   const initializeFromUrl = useCallback(() => {
-    redirectToHome();
-    
-    const languageParam = getUrlParam('language');
-    const userParam = getUrlParam('user');
-    
-    if (languageParam && isValidLanguage(languageParam)) {
-      i18n.changeLanguage(languageParam);
+    try {
+      redirectToHome();
+      
+      const languageParam = getUrlParam('language');
+      const userParam = getUrlParam('user');
+      
+      if (languageParam && isValidLanguage(languageParam)) {
+        i18n.changeLanguage(languageParam);
+      }
+      
+      let decodedUserParam = null;
+      if (userParam) {
+        try {
+          decodedUserParam = decodeURIComponent(userParam);
+        } catch (error) {
+          console.warn('Failed to decode user parameter:', error);
+          // Clear invalid user param and redirect to home
+          forceRedirectToHome();
+          throw new Error('Invalid URL parameters');
+        }
+      }
+      
+      return {
+        userParam: decodedUserParam,
+        languageParam
+      };
+    } catch (error) {
+      console.warn('URL parameter initialization failed:', error);
+      forceRedirectToHome();
+      throw error;
     }
-    
-    return {
-      userParam: userParam ? decodeURIComponent(userParam) : null,
-      languageParam
-    };
-  }, [getUrlParam, redirectToHome]);
+  }, [getUrlParam, redirectToHome, updateUrlParams, forceRedirectToHome]);
 
 
   return {
@@ -77,6 +110,7 @@ export const useUrlParams = () => {
     setLanguageParam,
     setUserParam,
     redirectToHome,
+    forceRedirectToHome,
     initializeFromUrl,
     setPagePath
   };

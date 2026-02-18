@@ -31,7 +31,7 @@ const App = () => {
   const classes = useAppStyles();
   const { t } = useTranslation();
   const { currentUser, setCurrentUser } = useUserStore();
-  const { initializeFromUrl, setUserParam, setLanguageParam, setPagePath } = useUrlParams();
+  const { initializeFromUrl, setUserParam, setLanguageParam, setPagePath, forceRedirectToHome } = useUrlParams();
   const [isDbInitialized, setIsDbInitialized] = useState(false);
   const [dbError, setDbError] = useState<string | null>(null);
   const [isLoadingFromUrl, setIsLoadingFromUrl] = useState(true);
@@ -43,17 +43,28 @@ const App = () => {
         setIsDbInitialized(true);
 
         // Initialize from URL parameters
-        const { userParam } = initializeFromUrl();
+        try {
+          const { userParam } = initializeFromUrl();
 
-        if (userParam) {
-          try {
-            const user = await getUserByName(userParam);
-            if (user) {
-              setCurrentUser(user);
+          if (userParam) {
+            try {
+              const user = await getUserByName(userParam);
+              if (user) {
+                setCurrentUser(user);
+              } else {
+                // User doesn't exist in database, redirect to home
+                console.warn('User not found in database, redirecting to home');
+                forceRedirectToHome();
+              }
+            } catch (error) {
+              // Database error when looking up user, redirect to home
+              console.warn('Database error looking up user, redirecting to home:', error);
+              forceRedirectToHome();
             }
-          } catch {
-            // Silent error handling - user will see the login form
           }
+        } catch (error) {
+          // URL parameter initialization failed, user already redirected to home
+          console.warn('URL parameter initialization failed, redirected to home:', error);
         }
 
         setIsLoadingFromUrl(false);
@@ -68,7 +79,7 @@ const App = () => {
     };
 
     initDb();
-  }, [setCurrentUser, initializeFromUrl]);
+  }, [setCurrentUser, initializeFromUrl, setUserParam, forceRedirectToHome]);
 
   // Update URL when user changes (but not on initial load)
   useEffect(() => {
