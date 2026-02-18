@@ -1,5 +1,5 @@
 import { sql } from '../connection';
-import type { User, CreateUserRequest } from '../../types';
+import type { User, CreateUserRequest } from '../../types/User';
 
 export const createUser = async (userData: CreateUserRequest): Promise<User> => {
   const result = await sql`

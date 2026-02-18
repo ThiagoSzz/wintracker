@@ -1,5 +1,5 @@
 import { sql } from '../connection';
-import type { Match, CreateMatchRequest, UpdateMatchRequest } from '../../types';
+import type { Match, CreateMatchRequest, UpdateMatchRequest } from '../../types/Match';
 
 export const getUserMatches = async (userId: number): Promise<Match[]> => {
   const result = await sql`
