@@ -1,7 +1,8 @@
 import { TextInput, Button } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { ErrorAlert } from '../ui/ErrorAlert';
-import { useFormValidation } from '../../hooks/useFormValidation';
+import { ErrorAlert } from '../../shared/ErrorAlert/ErrorAlert';
+import { useFormValidation } from '../../../hooks/useFormValidation';
+import { useUserInputStyles } from './UserInput.styles';
 
 interface UserInputProps {
   onSubmit: (validatedName: string) => void;
@@ -9,6 +10,7 @@ interface UserInputProps {
 }
 
 export const UserInput = ({ onSubmit, isLoading }: UserInputProps) => {
+  const classes = useUserInputStyles();
   const { t } = useTranslation();
   const { name, setName, error, validateAndSanitize } = useFormValidation();
 
@@ -22,14 +24,14 @@ export const UserInput = ({ onSubmit, isLoading }: UserInputProps) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div style={{ marginBottom: '1rem' }}>
+      <div className={classes.formGroup}>
         <TextInput
           label={t('enterName')}
           value={name}
           onChange={(e) => setName(e.target.value)}
           size="lg"
           disabled={isLoading}
-          style={{ marginBottom: '1rem' }}
+          className={classes.textInput}
         />
       </div>
 

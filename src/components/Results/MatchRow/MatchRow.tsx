@@ -1,9 +1,10 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { TextInput, Table, ActionIcon, Text, Tooltip } from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { CounterButton } from '../ui/CounterButton';
-import type { Match } from '../../types/Match';
+import { CounterButton } from '../../shared/CounterButton/CounterButton';
+import type { Match } from '../../../types/Match';
+import { useMatchRowStyles } from './MatchRow.styles';
 
 interface MatchRowProps {
   match: Match;
@@ -28,6 +29,7 @@ export const MatchRow = ({
   isHelpMode = false,
   currentHelpStep
 }: MatchRowProps) => {
+  const classes = useMatchRowStyles();
   const { t } = useTranslation();
 
   const matchId = match?.id;
@@ -60,21 +62,14 @@ export const MatchRow = ({
     }
   }, [matchId, onDelete]);
 
-  // Memoized values
-  const rowStyle = useMemo(() => ({}), []);
-
-  const cellStyle = useMemo(() => ({ 
-    textAlign: 'center' as const 
-  }), []);
-
   const isReadOnly = isEditMode && !isGhostRow;
   const counterDisabled = (isGhostRow && !opponentName.trim()) || isReadOnly;
 
   return (
-    <Table.Tr style={rowStyle}>
+    <Table.Tr>
       <Table.Td>
         {isReadOnly ? (
-          <Text size="sm" style={{ padding: '8px 12px' }}>
+          <Text size="sm" className={classes.textCell}>
             {opponentName}
           </Text>
         ) : (
@@ -96,7 +91,7 @@ export const MatchRow = ({
           </Tooltip>
         )}
       </Table.Td>
-      <Table.Td style={cellStyle}>
+      <Table.Td className={classes.centerCell}>
         {isReadOnly ? (
           <Text size="sm" fw={500}>
             {wins}
@@ -111,7 +106,7 @@ export const MatchRow = ({
           />
         )}
       </Table.Td>
-      <Table.Td style={cellStyle}>
+      <Table.Td className={classes.centerCell}>
         {isReadOnly ? (
           <Text size="sm" fw={500}>
             {losses}
@@ -125,7 +120,7 @@ export const MatchRow = ({
         )}
       </Table.Td>
       {isEditMode && (
-        <Table.Td style={cellStyle}>
+        <Table.Td className={classes.centerCell}>
           {!isGhostRow && (
             <ActionIcon
               color="red"

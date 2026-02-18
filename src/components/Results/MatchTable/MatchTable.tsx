@@ -1,8 +1,9 @@
 import { Table, Tooltip } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { MatchRow } from './MatchRow';
-import { useWinLossContext } from './WinLossContext';
-import type { Match } from '../../types/Match';
+import { MatchRow } from '../MatchRow/MatchRow';
+import { useResultsContext } from '../../../pages/Results/ResultsContext';
+import type { Match } from '../../../types/Match';
+import { useMatchTableStyles } from './MatchTable.styles';
 
 interface NewMatch {
   id: string;
@@ -28,7 +29,8 @@ export const MatchTable = ({
   onDelete,
 }: MatchTableProps) => {
   const { t } = useTranslation();
-  const { isRemoveMode, isHelpMode, currentStep } = useWinLossContext();
+  const { isRemoveMode, isHelpMode, currentStep } = useResultsContext();
+  const classes = useMatchTableStyles();
   
   const currentStepId = currentStep?.id;
   const currentStepLabel = currentStep?.label;
@@ -44,19 +46,17 @@ export const MatchTable = ({
       <Table striped highlightOnHover withTableBorder>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th style={{ width: isRemoveMode ? '40%' : '50%' }}>
+            <Table.Th className={isRemoveMode ? classes.opponentColumnRemove : classes.opponentColumnNormal}>
               {t('opponentName')}
             </Table.Th>
-            <Table.Th style={{ width: '25%', textAlign: 'center' }}>
+            <Table.Th className={classes.counterColumn}>
               {t('wins')}
             </Table.Th>
-            <Table.Th style={{ width: '25%', textAlign: 'center' }}>
+            <Table.Th className={classes.counterColumn}>
               {t('losses')}
             </Table.Th>
             {isRemoveMode && (
-              <Table.Th
-                style={{ width: '10%', textAlign: 'center' }}
-              ></Table.Th>
+              <Table.Th className={classes.removeColumn}></Table.Th>
             )}
           </Table.Tr>
         </Table.Thead>

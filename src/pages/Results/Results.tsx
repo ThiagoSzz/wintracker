@@ -1,9 +1,9 @@
 import { useCallback } from "react";
 import { Container, Title, LoadingOverlay, Alert } from "@mantine/core";
 import { useTranslation } from "react-i18next";
-import { Logo } from "../ui/Logo";
-import { LanguageSelector } from "../ui/LanguageSelector";
-import { ErrorAlert } from "../ui/ErrorAlert";
+import { Logo } from "../../components/shared/Logo/Logo";
+import { LanguageSelector } from "../../components/shared/LanguageSelector/LanguageSelector";
+import { ErrorAlert } from "../../components/shared/ErrorAlert/ErrorAlert";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import { useMatchesState } from "../../hooks/useMatchesState";
 import { useRemoveMode } from "../../hooks/useRemoveMode";
@@ -11,12 +11,14 @@ import { useDuplicateValidation } from "../../hooks/useDuplicateValidation";
 import { useMatchOperations } from "../../hooks/useMatchOperations";
 import { useGetUserMatches } from "../../hooks/useMatches";
 import { useUserStore } from "../../store/userStore";
-import { WinLossProvider } from "./WinLossContext";
-import { Toolbar } from "./Toolbar";
-import { MatchTable } from "./MatchTable";
-import { FooterBar } from "./FooterBar";
+import { ResultsProvider } from "./ResultsContext";
+import { Toolbar } from "../../components/Results/Toolbar/Toolbar";
+import { MatchTable } from "../../components/Results/MatchTable/MatchTable";
+import { FooterBar } from "../../components/Results/FooterBar/FooterBar";
+import { useResultsStyles } from "./Results.styles";
 
-export const WinLossTracker = () => {
+export const Results = () => {
+  const classes = useResultsStyles();
   const { t } = useTranslation();
   const { currentUser, clearUser } = useUserStore();
 
@@ -97,44 +99,37 @@ export const WinLossTracker = () => {
 
   if (error) {
     return (
-      <Container size="md" style={{ paddingTop: "2rem" }}>
+      <Container size="md" className={classes.container}>
         <Alert color="red">{t("databaseError")}</Alert>
       </Container>
     );
   }
 
   return (
-    <WinLossProvider 
+    <ResultsProvider 
       hasChanges={hasChanges}
       isRemoveMode={isRemoveMode}
       toggleRemoveMode={toggleRemoveMode}
       exitRemoveMode={exitRemoveMode}
     >
-      <Container
-        size="md"
-        style={{
-          paddingTop: "2rem",
-          paddingBottom: "2rem",
-          position: "relative",
-        }}
-      >
+      <Container size="md" className={classes.mainContainer}>
         <LoadingOverlay visible={isLoading} />
 
-        <div style={{ position: "absolute", top: "1rem", right: "1rem" }}>
+        <div className={classes.languageSelector}>
           <LanguageSelector />
         </div>
 
-        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+        <div className={classes.header}>
           <Logo
             order={2}
             onClick={handleLogoClick}
             interactive={true}
-            style={{ marginBottom: "0.5rem" }}
+            className={classes.logo}
           />
           <Title
             order={3}
             size="h4"
-            style={{ fontWeight: "normal", color: "#666" }}
+            className={classes.userName}
           >
             {currentUser.name}
           </Title>
@@ -170,6 +165,6 @@ export const WinLossTracker = () => {
           newMatchesLength={newMatches.length}
         />
       </Container>
-    </WinLossProvider>
+    </ResultsProvider>
   );
 };

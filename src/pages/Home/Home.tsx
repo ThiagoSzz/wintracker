@@ -1,19 +1,21 @@
 import { Container, Text } from "@mantine/core";
 import { useTranslation } from "react-i18next";
-import { Logo } from "../ui/Logo";
-import { LanguageSelector } from "../ui/LanguageSelector";
+import { Logo } from "../../components/shared/Logo/Logo";
+import { LanguageSelector } from "../../components/shared/LanguageSelector/LanguageSelector";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import { useUserAuth } from "../../hooks/useUserAuth";
-import { UserInput } from "./UserInput";
-import { WelcomeBack } from "./WelcomeBack";
-import { CreateAccount } from "./CreateAccount";
-import { Features } from "./Features";
+import { UserInput } from "../../components/Home/UserInput/UserInput";
+import { WelcomeBack } from "../../components/Home/WelcomeBack/WelcomeBack";
+import { CreateAccount } from "../../components/Home/CreateAccount/CreateAccount";
+import { Features } from "../../components/Home/Features/Features";
+import { useHomeStyles } from "./Home.styles";
 
-interface HomePageProps {
+interface HomeProps {
   onUserLogin: () => void;
 }
 
-export const HomePage = ({ onUserLogin }: HomePageProps) => {
+export const Home = ({ onUserLogin }: HomeProps) => {
+  const classes = useHomeStyles();
   const { t } = useTranslation();
   usePageTitle(t("homePageTitle"));
 
@@ -48,17 +50,14 @@ export const HomePage = ({ onUserLogin }: HomePageProps) => {
 
   if (state === "input") {
     return (
-      <Container
-        size="sm"
-        style={{ paddingTop: "2rem", paddingBottom: "2rem", position: "relative" }}
-      >
-        <div style={{ position: "absolute", top: "1rem", right: "1rem" }}>
+      <Container size="sm" className={classes.container}>
+        <div className={classes.languageSelector}>
           <LanguageSelector />
         </div>
 
-        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <Logo order={1} size="h1" style={{ marginBottom: "0.5rem" }} />
-          <Text size="lg" c="dimmed" style={{ marginBottom: "1rem" }}>
+        <div className={classes.header}>
+          <Logo order={1} size="h1" className={classes.logo} />
+          <Text size="lg" c="dimmed" className={classes.tagline}>
             {t("tagline")}
           </Text>
         </div>
@@ -72,11 +71,8 @@ export const HomePage = ({ onUserLogin }: HomePageProps) => {
 
   if (state === "confirming-existing") {
     return (
-      <Container
-        size="sm"
-        style={{ paddingTop: "2rem", paddingBottom: "2rem", position: "relative" }}
-      >
-        <div style={{ position: "absolute", top: "1rem", right: "1rem" }}>
+      <Container size="sm" className={classes.container}>
+        <div className={classes.languageSelector}>
           <LanguageSelector />
         </div>
 
@@ -93,11 +89,8 @@ export const HomePage = ({ onUserLogin }: HomePageProps) => {
 
   if (state === "confirming-new") {
     return (
-      <Container
-        size="sm"
-        style={{ paddingTop: "2rem", paddingBottom: "2rem", position: "relative" }}
-      >
-        <div style={{ position: "absolute", top: "1rem", right: "1rem" }}>
+      <Container size="sm" className={classes.container}>
+        <div className={classes.languageSelector}>
           <LanguageSelector />
         </div>
 
@@ -113,13 +106,13 @@ export const HomePage = ({ onUserLogin }: HomePageProps) => {
   }
 
   return (
-    <Container size="sm" style={{ paddingTop: "2rem", paddingBottom: "2rem", position: "relative" }}>
-      <div style={{ position: "absolute", top: "1rem", right: "1rem" }}>
+    <Container size="sm" className={classes.container}>
+      <div className={classes.languageSelector}>
         <LanguageSelector />
       </div>
 
-      <div style={{ textAlign: "center" }}>
-        <Logo order={1} size="h1" style={{ marginBottom: "1rem" }} />
+      <div className={classes.loadingContainer}>
+        <Logo order={1} size="h1" className={classes.loadingLogo} />
         <Text>{t("loading")}</Text>
       </div>
     </Container>

@@ -1,10 +1,12 @@
 import { Menu, Button, Group } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { LANGUAGE_CONFIG } from '../../types/Language';
+import { LANGUAGE_CONFIG } from '../../../types/Language';
+import { useLanguageSelectorStyles } from './LanguageSelector.styles';
 
 const languages = Object.values(LANGUAGE_CONFIG);
 
 export const LanguageSelector = () => {
+  const classes = useLanguageSelectorStyles();
   const { i18n } = useTranslation();
 
   const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
@@ -19,14 +21,9 @@ export const LanguageSelector = () => {
         <Button
           variant="subtle"
           size="sm"
-          style={{
-            padding: '4px 8px',
-            height: 'auto',
-            minHeight: '32px',
-            backgroundColor: 'transparent',
-          }}
+          className={classes.button}
         >
-          <span style={{ fontSize: '18px' }}>
+          <span className={classes.flag}>
             {currentLanguage.flag}
           </span>
         </Button>
@@ -37,12 +34,10 @@ export const LanguageSelector = () => {
           <Menu.Item
             key={language.code}
             onClick={() => handleLanguageChange(language.code)}
-            style={{
-              backgroundColor: i18n.language === language.code ? '#f1f3f4' : 'transparent',
-            }}
+            className={i18n.language === language.code ? classes.menuItemSelected : classes.menuItemDefault}
           >
-            <Group gap="xs" style={{ fontSize: '14px' }}>
-              <span style={{ fontSize: '16px' }}>{language.flag}</span>
+            <Group gap="xs" className={classes.menuGroup}>
+              <span className={classes.menuFlag}>{language.flag}</span>
               <span>{language.label}</span>
             </Group>
           </Menu.Item>

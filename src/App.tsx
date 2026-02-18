@@ -4,12 +4,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Notifications } from "@mantine/notifications";
 import { useTranslation } from "react-i18next";
 import { useUserStore } from "./store/userStore";
-import { HomePage } from "./components/HomePage/HomePage";
-import { WinLossTracker } from "./components/WinLossTracker/WinLossTracker";
+import { Home } from "./pages/Home/Home";
+import { Results } from "./pages/Results/Results";
 import { initializeDatabase } from "./database/connection";
 import { getUserByName } from "./database/queries/users";
 import { useUrlParams } from "./hooks/useUrlParams";
 import i18n from "./i18n/config";
+import { useAppStyles } from "./App.styles";
 
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
@@ -27,6 +28,7 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
+  const classes = useAppStyles();
   const { t } = useTranslation();
   const { currentUser, setCurrentUser } = useUserStore();
   const { initializeFromUrl, setUserParam, setLanguageParam, setPagePath } = useUrlParams();
@@ -98,7 +100,7 @@ const App = () => {
   if (dbError) {
     return (
       <MantineProvider>
-        <Container size="sm" style={{ paddingTop: "2rem" }}>
+        <Container size="sm" className={classes.container}>
           <Alert color="red" title={t("databaseConnectionError")}>
             {dbError}
           </Alert>
@@ -110,14 +112,7 @@ const App = () => {
   if (!isDbInitialized || isLoadingFromUrl) {
     return (
       <MantineProvider>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100vh",
-          }}
-        >
+        <div className={classes.loadingContainer}>
           <div>{t("loading")}</div>
         </div>
       </MantineProvider>
@@ -129,9 +124,9 @@ const App = () => {
       <QueryClientProvider client={queryClient}>
         <Notifications />
         {currentUser ? (
-          <WinLossTracker />
+          <Results />
         ) : (
-          <HomePage onUserLogin={handleUserLogin} />
+          <Home onUserLogin={handleUserLogin} />
         )}
       </QueryClientProvider>
     </MantineProvider>

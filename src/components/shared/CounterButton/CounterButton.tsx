@@ -1,5 +1,6 @@
 import { ActionIcon, Tooltip } from "@mantine/core";
 import { IconPlus, IconMinus } from "@tabler/icons-react";
+import { useCounterButtonStyles } from './CounterButton.styles';
 
 interface CounterButtonProps {
   value: number;
@@ -16,6 +17,8 @@ export const CounterButton = ({
   tooltipLabel,
   showTooltip = false,
 }: CounterButtonProps) => {
+  const classes = useCounterButtonStyles();
+
   const handleIncrement = () => {
     onChange(value + 1);
   };
@@ -27,7 +30,7 @@ export const CounterButton = ({
   };
 
   const counterContent = (
-    <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+    <div className={classes.container}>
       <ActionIcon
         variant="filled"
         size="sm"
@@ -37,14 +40,7 @@ export const CounterButton = ({
         <IconMinus size={12} />
       </ActionIcon>
 
-      <span
-        style={{
-          minWidth: "24px",
-          textAlign: "center",
-          fontSize: "16px",
-          fontWeight: "bold",
-        }}
-      >
+      <span className={classes.valueDisplay}>
         {value}
       </span>
 

@@ -1,6 +1,6 @@
 import { createContext, useContext, ReactNode, useState } from 'react';
 
-interface WinLossContextValue {
+interface ResultsContextValue {
   hasChanges: boolean;
   isHelpMode: boolean;
   currentStep?: {
@@ -13,9 +13,9 @@ interface WinLossContextValue {
   setHelpMode: (isHelpMode: boolean, currentStep?: { id: string; label: string }) => void;
 }
 
-const WinLossContext = createContext<WinLossContextValue | undefined>(undefined);
+const ResultsContext = createContext<ResultsContextValue | undefined>(undefined);
 
-interface WinLossProviderProps {
+interface ResultsProviderProps {
   children: ReactNode;
   hasChanges: boolean;
   isRemoveMode: boolean;
@@ -23,13 +23,13 @@ interface WinLossProviderProps {
   exitRemoveMode: () => void;
 }
 
-export const WinLossProvider = ({ 
+export const ResultsProvider = ({ 
   children, 
   hasChanges, 
   isRemoveMode, 
   toggleRemoveMode, 
   exitRemoveMode 
-}: WinLossProviderProps) => {
+}: ResultsProviderProps) => {
   const [isHelpMode, setIsHelpMode] = useState(false);
   const [currentStep, setCurrentStep] = useState<{ id: string; label: string } | undefined>(undefined);
 
@@ -38,7 +38,7 @@ export const WinLossProvider = ({
     setCurrentStep(step);
   };
 
-  const value: WinLossContextValue = {
+  const value: ResultsContextValue = {
     hasChanges,
     isHelpMode,
     currentStep,
@@ -49,16 +49,16 @@ export const WinLossProvider = ({
   };
 
   return (
-    <WinLossContext.Provider value={value}>
+    <ResultsContext.Provider value={value}>
       {children}
-    </WinLossContext.Provider>
+    </ResultsContext.Provider>
   );
 };
 
-export const useWinLossContext = () => {
-  const context = useContext(WinLossContext);
+export const useResultsContext = () => {
+  const context = useContext(ResultsContext);
   if (context === undefined) {
-    throw new Error('useWinLossContext must be used within a WinLossProvider');
+    throw new Error('useResultsContext must be used within a ResultsProvider');
   }
   return context;
 };

@@ -2,8 +2,9 @@ import { Group, Button, Tooltip, ActionIcon, Text } from "@mantine/core";
 import { IconHelpHexagon, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { useTranslation } from "react-i18next";
 import { useEffect } from 'react';
-import { useHelpMode } from '../../hooks/useHelpMode';
-import { useWinLossContext } from "./WinLossContext";
+import { useHelpMode } from '../../../hooks/useHelpMode';
+import { useResultsContext } from "../../../pages/Results/ResultsContext";
+import { useFooterBarStyles } from './FooterBar.styles';
 
 interface FooterBarProps {
   onSave: () => void;
@@ -20,8 +21,9 @@ export const FooterBar = ({
   editableMatchesLength,
   newMatchesLength,
 }: FooterBarProps) => {
+  const classes = useFooterBarStyles();
   const { t } = useTranslation();
-  const { hasChanges, isHelpMode, currentStep, setHelpMode } = useWinLossContext();
+  const { hasChanges, isHelpMode, currentStep, setHelpMode } = useResultsContext();
   
   const {
     currentHelpStep,
@@ -58,7 +60,7 @@ export const FooterBar = ({
 
   return (
     <>
-      <Group justify="space-between" style={{ marginTop: '1rem' }}>
+      <Group justify="space-between" className={classes.footer}>
         <Group gap="xs">
           <Tooltip label={t('helpButton')}>
             <ActionIcon
@@ -81,7 +83,7 @@ export const FooterBar = ({
                 <IconChevronLeft size={16} />
               </ActionIcon>
 
-              <Text size="sm" style={{ minWidth: '40px', textAlign: 'center' }}>
+              <Text size="sm" className={classes.stepCounter}>
                 {currentHelpStep + 1}/{totalSteps}
               </Text>
 
@@ -97,7 +99,7 @@ export const FooterBar = ({
           )}
         </Group>
 
-        <Group style={{ position: 'relative' }}>
+        <Group>
           <Tooltip
             label={currentStepId === 'revertButton' ? currentStepLabel : undefined}
             opened={isHelpMode && currentStepId === 'revertButton'}
@@ -105,17 +107,9 @@ export const FooterBar = ({
             multiline
             withArrow
           >
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <div className={classes.revertButtonContainer}>
               {hasChanges && (
-                <div
-                  style={{
-                    width: '10px',
-                    height: '10px',
-                    backgroundColor: '#ffd43b',
-                    borderRadius: '50%',
-                    marginRight: '25px',
-                  }}
-                />
+                <div className={classes.changeIndicator} />
               )}
               <Button
                 color="red"
@@ -134,7 +128,7 @@ export const FooterBar = ({
             multiline
             withArrow
           >
-            <div style={{ position: 'relative' }}>
+            <div className={classes.saveButtonContainer}>
               <Button
                 color="green"
                 onClick={onSave}
@@ -144,15 +138,7 @@ export const FooterBar = ({
                 {t('saveButton')}
               </Button>
               {hasChanges && (
-                <div style={{ 
-                  position: 'absolute',
-                  top: '100%',
-                  right: '0',
-                  marginTop: '12px',
-                  color: '#868e96',
-                  fontSize: '12px',
-                  whiteSpace: 'nowrap'
-                }}>
+                <div className={classes.unsavedChangesText}>
                   {t('unsavedChangesFooter')}
                 </div>
               )}

@@ -1,4 +1,5 @@
 import { Title } from "@mantine/core";
+import { useLogoStyles } from './Logo.styles';
 
 interface LogoProps {
   order?: 1 | 2 | 3 | 4 | 5 | 6;
@@ -18,19 +19,9 @@ export const Logo = ({
   className,
   interactive = false,
 }: LogoProps) => {
-  const baseStyle: React.CSSProperties = {
-    position: "relative",
-    display: "inline-block",
-    ...style,
-  };
-
-  const interactiveStyle: React.CSSProperties = interactive
-    ? {
-        cursor: "pointer",
-        userSelect: "none",
-        transition: "color 0.2s ease",
-      }
-    : {};
+  const classes = useLogoStyles();
+  
+  const combinedClassName = `${classes.logoBase} ${interactive ? classes.interactive : ''} ${className || ''}`.trim();
 
   const handleMouseEnter = interactive
     ? (e: React.MouseEvent<HTMLHeadingElement>) => {
@@ -48,20 +39,13 @@ export const Logo = ({
     <Title
       order={order}
       size={size}
-      style={{ ...baseStyle, ...interactiveStyle }}
+      style={style}
       onClick={onClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className={className}
+      className={combinedClassName}
     >
-      <span style={{ 
-        fontSize: "1em", 
-        backgroundColor: "#1c7ed6", 
-        color: "white",
-        padding: "0px 6px",
-        borderRadius: "4px",
-        marginRight: "2px"
-      }}>win</span>tracker
+      <span className={classes.winSpan}>win</span>tracker
     </Title>
   );
 };

@@ -1,6 +1,7 @@
 import { Group, Button, Tooltip } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { useWinLossContext } from './WinLossContext';
+import { useResultsContext } from '../../../pages/Results/ResultsContext';
+import { useToolbarStyles } from './Toolbar.styles';
 
 interface ToolbarProps {
   onAddNewMatch: () => void;
@@ -11,8 +12,9 @@ export const Toolbar = ({
   onAddNewMatch,
   newMatchesLength,
 }: ToolbarProps) => {
+  const classes = useToolbarStyles();
   const { t } = useTranslation();
-  const { isHelpMode, currentStep, isRemoveMode, toggleRemoveMode } = useWinLossContext();
+  const { isHelpMode, currentStep, isRemoveMode, toggleRemoveMode } = useResultsContext();
   
   const currentStepId = currentStep?.id;
   const currentStepLabel = currentStep?.label;
@@ -21,7 +23,7 @@ export const Toolbar = ({
     <Group
       justify="space-between"
       align="center"
-      style={{ marginBottom: '1rem' }}
+      className={classes.toolbar}
     >
       <Tooltip
         label={currentStepId === 'removeButton' ? currentStepLabel : undefined}
@@ -35,7 +37,7 @@ export const Toolbar = ({
           color="red"
           onClick={toggleRemoveMode}
           size="sm"
-          style={{ minWidth: 'fit-content' }}
+          className={classes.button}
         >
           <span className="desktop-text">
             {newMatchesLength > 0
@@ -65,7 +67,7 @@ export const Toolbar = ({
           color="blue"
           onClick={onAddNewMatch}
           size="sm"
-          style={{ minWidth: 'fit-content' }}
+          className={classes.button}
           disabled={newMatchesLength > 0}
         >
           <span className="desktop-text">+ {t("addNewOpponent")}</span>
