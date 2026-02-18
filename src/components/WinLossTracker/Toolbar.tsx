@@ -39,14 +39,14 @@ export const Toolbar = ({
         >
           <span className="desktop-text">
             {newMatchesLength > 0
-              ? "Cancel"
+              ? t("cancelButton")
               : isRemoveMode
                 ? t("stopRemovingButton")
                 : t("removeOpponentsButton")}
           </span>
           <span className="mobile-text">
             {newMatchesLength > 0
-              ? "Cancel"
+              ? t("cancelButton")
               : isRemoveMode
                 ? t("stopRemovingButtonShort")
                 : t("removeOpponentsButtonShort")}

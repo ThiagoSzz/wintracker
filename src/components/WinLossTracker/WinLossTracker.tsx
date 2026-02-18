@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { Container, Title, LoadingOverlay, Alert } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { Logo } from "../ui/Logo";
+import { LanguageSelector } from "../ui/LanguageSelector";
 import { ErrorAlert } from "../ui/ErrorAlert";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import { useMatchesState } from "../../hooks/useMatchesState";
@@ -19,7 +20,7 @@ export const WinLossTracker = () => {
   const { t } = useTranslation();
   const { currentUser, clearUser } = useUserStore();
 
-  usePageTitle("wintracker | Your results");
+  usePageTitle(t("winLossTrackerPageTitle"));
 
   const {
     data: originalMatches = [],
@@ -69,8 +70,8 @@ export const WinLossTracker = () => {
         clearDuplicateError();
         exitRemoveMode();
       }
-    } catch (error) {
-      console.error("Error saving changes:", error);
+    } catch {
+      // Silent error handling
     }
   }, [
     currentUser,
@@ -118,6 +119,10 @@ export const WinLossTracker = () => {
         }}
       >
         <LoadingOverlay visible={isLoading} />
+
+        <div style={{ position: "absolute", top: "1rem", right: "1rem" }}>
+          <LanguageSelector />
+        </div>
 
         <div style={{ textAlign: "center", marginBottom: "2rem" }}>
           <Logo

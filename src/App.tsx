@@ -1,16 +1,18 @@
-import { useState, useEffect } from 'react';
-import { MantineProvider, Container, Alert } from '@mantine/core';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Notifications } from '@mantine/notifications';
-import { useUserStore } from './store/userStore';
-import { HomePage } from './components/HomePage/HomePage';
-import { WinLossTracker } from './components/WinLossTracker/WinLossTracker';
-import { initializeDatabase } from './database/connection';
-import { getUserByName } from './database/queries/users';
-import './i18n/config';
+import { useState, useEffect } from "react";
+import { MantineProvider, Container, Alert } from "@mantine/core";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Notifications } from "@mantine/notifications";
+import { useTranslation } from "react-i18next";
+import { useUserStore } from "./store/userStore";
+import { HomePage } from "./components/HomePage/HomePage";
+import { WinLossTracker } from "./components/WinLossTracker/WinLossTracker";
+import { initializeDatabase } from "./database/connection";
+import { getUserByName } from "./database/queries/users";
+import { useUrlParams } from "./hooks/useUrlParams";
+import i18n from "./i18n/config";
 
-import '@mantine/core/styles.css';
-import '@mantine/notifications/styles.css';
+import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,7 +27,9 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
+  const { t } = useTranslation();
   const { currentUser, setCurrentUser } = useUserStore();
+  const { initializeFromUrl, setUserParam, setLanguageParam, setPagePath } = useUrlParams();
   const [isDbInitialized, setIsDbInitialized] = useState(false);
   const [dbError, setDbError] = useState<string | null>(null);
   const [isLoadingFromUrl, setIsLoadingFromUrl] = useState(true);
@@ -35,61 +39,57 @@ const App = () => {
       try {
         await initializeDatabase();
         setIsDbInitialized(true);
-        
-        // After DB is initialized, check URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const userParam = urlParams.get('user');
-        
-        console.log('Checking URL parameters:', { userParam, currentURL: window.location.href });
-        
+
+        // Initialize from URL parameters
+        const { userParam } = initializeFromUrl();
+
         if (userParam) {
           try {
-            // Decode the URL parameter in case it has encoded characters
-            const decodedUserParam = decodeURIComponent(userParam);
-            console.log('Attempting to load user from URL:', decodedUserParam);
-            const user = await getUserByName(decodedUserParam);
+            const user = await getUserByName(userParam);
             if (user) {
-              console.log('Successfully loaded user from URL:', user);
               setCurrentUser(user);
-            } else {
-              console.warn('User not found in database:', decodedUserParam);
             }
-          } catch (error) {
-            console.error('Failed to load user from URL:', error);
+          } catch {
+            // Silent error handling - user will see the login form
           }
         }
-        
+
         setIsLoadingFromUrl(false);
       } catch (error) {
-        console.error('Failed to initialize database:', error);
-        setDbError(error instanceof Error ? error.message : 'Database initialization failed');
+        setDbError(
+          error instanceof Error
+            ? error.message
+            : "Database initialization failed",
+        );
         setIsLoadingFromUrl(false);
       }
     };
 
     initDb();
-  }, [setCurrentUser]);
+  }, [setCurrentUser, initializeFromUrl]);
 
   // Update URL when user changes (but not on initial load)
   useEffect(() => {
-    // Skip URL updates during initial load when we're loading from URL
+    if (isLoadingFromUrl) return;
+    setUserParam(currentUser?.name || null);
+  }, [currentUser, isLoadingFromUrl, setUserParam]);
+
+  // Update URL when language changes
+  useEffect(() => {
+    if (isLoadingFromUrl) return;
+    setLanguageParam(i18n.language);
+  }, [i18n.language, isLoadingFromUrl, setLanguageParam]);
+
+  // Update page path based on current view
+  useEffect(() => {
     if (isLoadingFromUrl) return;
     
-    const urlParams = new URLSearchParams(window.location.search);
-    
     if (currentUser) {
-      // Encode the user name to handle special characters and spaces
-      urlParams.set('user', encodeURIComponent(currentUser.name));
+      setPagePath('/results');
     } else {
-      urlParams.delete('user');
+      setPagePath('/home');
     }
-    
-    const newUrl = urlParams.toString() 
-      ? `${window.location.pathname}?${urlParams.toString()}`
-      : window.location.pathname;
-    
-    window.history.replaceState({}, '', newUrl);
-  }, [currentUser, isLoadingFromUrl]);
+  }, [currentUser, isLoadingFromUrl, setPagePath]);
 
   const handleUserLogin = () => {
     // Navigation is handled by the user store state change
@@ -98,8 +98,8 @@ const App = () => {
   if (dbError) {
     return (
       <MantineProvider>
-        <Container size="sm" style={{ paddingTop: '2rem' }}>
-          <Alert color="red" title="Database Connection Error">
+        <Container size="sm" style={{ paddingTop: "2rem" }}>
+          <Alert color="red" title={t("databaseConnectionError")}>
             {dbError}
           </Alert>
         </Container>
@@ -110,8 +110,15 @@ const App = () => {
   if (!isDbInitialized || isLoadingFromUrl) {
     return (
       <MantineProvider>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-          <div>Loading...</div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh",
+          }}
+        >
+          <div>{t("loading")}</div>
         </div>
       </MantineProvider>
     );

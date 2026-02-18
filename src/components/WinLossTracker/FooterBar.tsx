@@ -153,7 +153,7 @@ export const FooterBar = ({
                   fontSize: '12px',
                   whiteSpace: 'nowrap'
                 }}>
-                  Unsaved changes
+                  {t('unsavedChangesFooter')}
                 </div>
               )}
             </div>

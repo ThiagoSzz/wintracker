@@ -6,7 +6,9 @@ if (!databaseUrl || databaseUrl === 'your_neon_connection_string_here') {
   throw new Error('Please set VITE_DATABASE_URL in your .env.local file with a valid Neon connection string');
 }
 
-export const sql = neon(databaseUrl);
+export const sql = neon(databaseUrl, {
+  disableWarningInBrowsers: true
+});
 
 // Singleton pattern for database initialization
 let isInitialized = false;
