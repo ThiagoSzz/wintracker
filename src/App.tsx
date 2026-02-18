@@ -3,6 +3,7 @@ import { MantineProvider, Container, Alert } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Notifications } from "@mantine/notifications";
 import { useTranslation } from "react-i18next";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { useUserStore } from "./store/userStore";
 import { Home } from "./pages/Home/Home";
 import { Results } from "./pages/Results/Results";
@@ -139,6 +140,7 @@ const App = () => {
         ) : (
           <Home onUserLogin={handleUserLogin} />
         )}
+        <SpeedInsights />
       </QueryClientProvider>
     </MantineProvider>
   );
