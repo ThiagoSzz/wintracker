@@ -144,6 +144,7 @@ export const Results = () => {
           />
         )}
 
+
         <Toolbar
           onAddNewMatch={addNewMatch}
           newMatchesLength={newMatches.length}
@@ -163,6 +164,8 @@ export const Results = () => {
           isLoading={isSaving}
           editableMatchesLength={editableMatches.length}
           newMatchesLength={newMatches.length}
+          matches={originalMatches}
+          userName={currentUser.name}
         />
       </Container>
     </ResultsProvider>

@@ -18,7 +18,7 @@ export const useHelpMode = (editableMatchesLength: number, newMatchesLength: num
   const nextHelpStep = useCallback(() => {
     setCurrentHelpStep((prev) => {
       const hasFirstRow = editableMatchesLength > 0 || newMatchesLength > 0;
-      const totalSteps = hasFirstRow ? 7 : 5;
+      const totalSteps = hasFirstRow ? 8 : 6;
       return prev < totalSteps - 1 ? prev + 1 : prev;
     });
   }, [editableMatchesLength, newMatchesLength]);
@@ -45,6 +45,7 @@ export const useHelpMode = (editableMatchesLength: number, newMatchesLength: num
       { id: "saveButton", label: t("helpTooltipSave") },
       { id: "revertButton", label: t("helpTooltipRevert") },
       { id: "removeButton", label: t("helpTooltipRemoveButton") },
+      { id: "generateReportButton", label: t("helpTooltipGenerateReport") },
     );
 
     return steps;

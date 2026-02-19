@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n/config';
@@ -85,7 +86,6 @@ export const useUrlParams = () => {
         try {
           decodedUserParam = decodeURIComponent(userParam);
         } catch (error) {
-          console.warn('Failed to decode user parameter:', error);
           // Clear invalid user param and redirect to home
           forceRedirectToHome();
           throw new Error('Invalid URL parameters');
@@ -97,7 +97,6 @@ export const useUrlParams = () => {
         languageParam
       };
     } catch (error) {
-      console.warn('URL parameter initialization failed:', error);
       forceRedirectToHome();
       throw error;
     }

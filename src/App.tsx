@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from "react";
 import { MantineProvider, Container, Alert } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -32,7 +33,13 @@ const App = () => {
   const classes = useAppStyles();
   const { t } = useTranslation();
   const { currentUser, setCurrentUser } = useUserStore();
-  const { initializeFromUrl, setUserParam, setLanguageParam, setPagePath, forceRedirectToHome } = useUrlParams();
+  const {
+    initializeFromUrl,
+    setUserParam,
+    setLanguageParam,
+    setPagePath,
+    forceRedirectToHome,
+  } = useUrlParams();
   const [isDbInitialized, setIsDbInitialized] = useState(false);
   const [dbError, setDbError] = useState<string | null>(null);
   const [isLoadingFromUrl, setIsLoadingFromUrl] = useState(true);
@@ -53,19 +60,14 @@ const App = () => {
               if (user) {
                 setCurrentUser(user);
               } else {
-                // User doesn't exist in database, redirect to home
-                console.warn('User not found in database, redirecting to home');
                 forceRedirectToHome();
               }
             } catch (error) {
-              // Database error when looking up user, redirect to home
-              console.warn('Database error looking up user, redirecting to home:', error);
               forceRedirectToHome();
             }
           }
         } catch (error) {
-          // URL parameter initialization failed, user already redirected to home
-          console.warn('URL parameter initialization failed, redirected to home:', error);
+          // If URL initialization fails, we can still show the app without user data
         }
 
         setIsLoadingFromUrl(false);
@@ -97,11 +99,11 @@ const App = () => {
   // Update page path based on current view
   useEffect(() => {
     if (isLoadingFromUrl) return;
-    
+
     if (currentUser) {
-      setPagePath('/results');
+      setPagePath("/results");
     } else {
-      setPagePath('/home');
+      setPagePath("/home");
     }
   }, [currentUser, isLoadingFromUrl, setPagePath]);
 
@@ -135,11 +137,7 @@ const App = () => {
     <MantineProvider>
       <QueryClientProvider client={queryClient}>
         <Notifications />
-        {currentUser ? (
-          <Results />
-        ) : (
-          <Home onUserLogin={handleUserLogin} />
-        )}
+        {currentUser ? <Results /> : <Home onUserLogin={handleUserLogin} />}
         <SpeedInsights />
       </QueryClientProvider>
     </MantineProvider>

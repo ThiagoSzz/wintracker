@@ -43,6 +43,7 @@
       "helpTooltipAddButton": "Adicionar um novo oponente no histórico de partidas",
       "helpTooltipOpponentField": "Digite o nome do seu oponente aqui",
       "helpTooltipCounterButtons": "Clique em + para adicionar uma vitória/derrota ou - para subtrair",
+      "helpTooltipGenerateReport": "Gerar um relatório visual com seus melhores e piores desempenhos contra oponentes",
       "helpNext": "Próximo",
       "helpPrevious": "Anterior",
       "helpClose": "Fechar Ajuda",
@@ -56,7 +57,24 @@
       "homePageTitle": "wintracker | Início",
       "winLossTrackerPageTitle": "wintracker | Seus resultados",
       "cancelButton": "Cancelar",
-      "unsavedChangesFooter": "Alterações não salvas"
+      "unsavedChangesFooter": "Alterações não salvas",
+      "generateReport": "Gerar Relatório",
+      "generatedReport": "Seu ranking de oponentes",
+      "reportError": "Erro no Relatório",
+      "noMatchesFound": "Nenhuma partida encontrada para gerar o relatório",
+      "insufficientDataForReport": "Dados insuficientes para gerar o relatório. São necessários pelo menos 3 oponentes com 3 ou mais partidas cada.",
+      "reportGenerationError": "Erro ao gerar o relatório. Tente novamente.",
+      "openInNewPage": "Abrir",
+      "download": "Baixar",
+      "downloadComplete": "Download Completo",
+      "reportDownloaded": "Relatório baixado com sucesso!",
+      "winTrackerReport": "RELATÓRIO WINTRACKER",
+      "player": "Jogador",
+      "generatedOn": "Gerado em",
+      "bestWinRatios": "MELHORES TAXAS DE VITÓRIA",
+      "highestLossRatios": "MAIORES TAXAS DE DERROTA",
+      "otherRankings": "Outras Classificações:",
+      "place": "Lugar"
     }
   },
   "en": {
@@ -103,6 +121,7 @@
       "helpTooltipAddButton": "Add a new opponent to track matches against",
       "helpTooltipOpponentField": "Enter the name of your opponent here",
       "helpTooltipCounterButtons": "Click + to add a win/loss or - to subtract",
+      "helpTooltipGenerateReport": "Generate a visual report showing your best and worst win/loss ratios against opponents",
       "helpNext": "Next",
       "helpPrevious": "Previous",
       "helpClose": "Close Help",
@@ -116,7 +135,24 @@
       "homePageTitle": "wintracker | Home",
       "winLossTrackerPageTitle": "wintracker | Your results",
       "cancelButton": "Cancel",
-      "unsavedChangesFooter": "Unsaved changes"
+      "unsavedChangesFooter": "Unsaved changes",
+      "generateReport": "Generate Report",
+      "generatedReport": "Your opponent rankings",
+      "reportError": "Report Error",
+      "noMatchesFound": "No matches found to generate report",
+      "insufficientDataForReport": "Insufficient data to generate report. At least 3 opponents with 3 or more matches each are required.",
+      "reportGenerationError": "Error generating report. Please try again.",
+      "openInNewPage": "Open",
+      "download": "Download",
+      "downloadComplete": "Download Complete",
+      "reportDownloaded": "Report downloaded successfully!",
+      "winTrackerReport": "WINTRACKER REPORT",
+      "player": "Player",
+      "generatedOn": "Generated on",
+      "bestWinRatios": "BEST WIN RATIOS",
+      "highestLossRatios": "HIGHEST LOSS RATIOS",
+      "otherRankings": "Other Rankings:",
+      "place": "Place"
     }
   }
 }
