@@ -4,12 +4,14 @@ import { useTranslation } from "react-i18next";
 import { Logo } from "../../components/shared/Logo/Logo";
 import { LanguageSelector } from "../../components/shared/LanguageSelector/LanguageSelector";
 import { ErrorAlert } from "../../components/shared/ErrorAlert/ErrorAlert";
+import { HelpNavigation } from "../../components/shared/HelpNavigation/HelpNavigation";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import { useMatchesState } from "../../hooks/useMatchesState";
 import { useRemoveMode } from "../../hooks/useRemoveMode";
 import { useDuplicateValidation } from "../../hooks/useDuplicateValidation";
 import { useMatchOperations } from "../../hooks/useMatchOperations";
 import { useGetUserMatches } from "../../hooks/useMatches";
+import { useHelpMode } from "../../hooks/useHelpMode";
 import { useUserStore } from "../../store/userStore";
 import { ResultsProvider } from "./ResultsContext";
 import { Toolbar } from "../../components/Results/Toolbar/Toolbar";
@@ -50,6 +52,15 @@ export const Results = () => {
 
   const { saveChanges, isLoading: isSaving } = useMatchOperations();
 
+  const {
+    isHelpMode,
+    currentHelpStep,
+    currentStep: helpStep,
+    totalSteps,
+    nextHelpStep,
+    prevHelpStep,
+    toggleHelpMode,
+  } = useHelpMode(editableMatches.length, newMatches.length);
 
   const handleSave = useCallback(async () => {
     if (!currentUser) return;
@@ -93,6 +104,10 @@ export const Results = () => {
     clearUser();
   }, [clearUser]);
 
+  const handleCloseHelpMode = useCallback(() => {
+    toggleHelpMode();
+  }, [toggleHelpMode]);
+
   if (!currentUser) {
     return null;
   }
@@ -111,6 +126,8 @@ export const Results = () => {
       isRemoveMode={isRemoveMode}
       toggleRemoveMode={toggleRemoveMode}
       exitRemoveMode={exitRemoveMode}
+      isHelpMode={isHelpMode}
+      currentStep={helpStep}
     >
       <Container size="md" className={classes.mainContainer}>
         <LoadingOverlay visible={isLoading} />
@@ -144,7 +161,6 @@ export const Results = () => {
           />
         )}
 
-
         <Toolbar
           onAddNewMatch={addNewMatch}
           newMatchesLength={newMatches.length}
@@ -166,7 +182,21 @@ export const Results = () => {
           newMatchesLength={newMatches.length}
           matches={originalMatches}
           userName={currentUser.name}
+          isHelpMode={isHelpMode}
+          toggleHelpMode={toggleHelpMode}
         />
+
+        {isHelpMode && (
+          <HelpNavigation
+            currentStep={currentHelpStep}
+            totalSteps={totalSteps}
+            onPrevious={prevHelpStep}
+            onNext={nextHelpStep}
+            onClose={handleCloseHelpMode}
+            isFirstStep={currentHelpStep === 0}
+            isLastStep={currentHelpStep === totalSteps - 1}
+          />
+        )}
       </Container>
     </ResultsProvider>
   );

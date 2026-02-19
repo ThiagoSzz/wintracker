@@ -1,13 +1,6 @@
-import { Group, Button, Tooltip, ActionIcon, Text } from "@mantine/core";
-import {
-  IconHelpHexagon,
-  IconChevronLeft,
-  IconChevronRight,
-  IconChartBar,
-} from "@tabler/icons-react";
+import { Group, Button, Tooltip, ActionIcon } from "@mantine/core";
+import { IconHelpHexagon, IconChartBar } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
-import { useEffect } from "react";
-import { useHelpMode } from "../../../hooks/useHelpMode";
 import { useReportGeneration } from "../../../hooks/useReportGeneration";
 import { useResultsContext } from "../../../pages/Results/ResultsContext";
 import { ReportModal } from "../../shared/ReportModal/ReportModal";
@@ -22,30 +15,22 @@ interface FooterBarProps {
   newMatchesLength: number;
   matches: Match[];
   userName: string;
+  isHelpMode: boolean;
+  toggleHelpMode: () => void;
 }
 
 export const FooterBar = ({
   onSave,
   onRevert,
   isLoading,
-  editableMatchesLength,
-  newMatchesLength,
   matches,
   userName,
+  isHelpMode,
+  toggleHelpMode,
 }: FooterBarProps) => {
   const classes = useFooterBarStyles();
   const { t } = useTranslation();
-  const { hasChanges, isHelpMode, currentStep, setHelpMode } =
-    useResultsContext();
-
-  const {
-    currentHelpStep,
-    currentStep: helpStep,
-    totalSteps,
-    toggleHelpMode: toggleHelpModeLocal,
-    nextHelpStep,
-    prevHelpStep,
-  } = useHelpMode(editableMatchesLength, newMatchesLength);
+  const { hasChanges, currentStep } = useResultsContext();
 
   const {
     isGenerating,
@@ -60,25 +45,10 @@ export const FooterBar = ({
   const currentStepId = currentStep?.id;
   const currentStepLabel = currentStep?.label;
 
-  // Sync help step changes with context
-  useEffect(() => {
-    if (isHelpMode && helpStep) {
-      setHelpMode(true, helpStep);
+  const handleToggleHelpMode = () => {
+    if (!isHelpMode) {
+      toggleHelpMode();
     }
-  }, [helpStep, isHelpMode, setHelpMode]);
-
-  const toggleHelpMode = () => {
-    const newHelpMode = !isHelpMode;
-    toggleHelpModeLocal();
-    setHelpMode(newHelpMode, newHelpMode ? helpStep : undefined);
-  };
-
-  const handleNextHelpStep = () => {
-    nextHelpStep();
-  };
-
-  const handlePrevHelpStep = () => {
-    prevHelpStep();
   };
 
   const handleGenerateReport = () => {
@@ -115,38 +85,12 @@ export const FooterBar = ({
           <Tooltip label={t("helpButton")}>
             <ActionIcon
               size="lg"
-              onClick={toggleHelpMode}
-              color={isHelpMode ? "blue" : "#ffa756"}
+              onClick={handleToggleHelpMode}
+              color="#ffa756"
             >
               <IconHelpHexagon size={20} strokeWidth={1.4} />
             </ActionIcon>
           </Tooltip>
-
-          {isHelpMode && (
-            <Group gap={0}>
-              <ActionIcon
-                variant="outline"
-                onClick={handlePrevHelpStep}
-                disabled={currentHelpStep === 0}
-                size="md"
-              >
-                <IconChevronLeft size={16} />
-              </ActionIcon>
-
-              <Text size="sm" className={classes.stepCounter}>
-                {currentHelpStep + 1}/{totalSteps}
-              </Text>
-
-              <ActionIcon
-                variant="outline"
-                onClick={handleNextHelpStep}
-                disabled={currentHelpStep === totalSteps - 1}
-                size="md"
-              >
-                <IconChevronRight size={16} />
-              </ActionIcon>
-            </Group>
-          )}
         </Group>
 
         <Group>
