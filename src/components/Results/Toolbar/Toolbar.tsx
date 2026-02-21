@@ -6,11 +6,13 @@ import { useToolbarStyles } from './Toolbar.styles';
 interface ToolbarProps {
   onAddNewMatch: () => void;
   newMatchesLength: number;
+  onCancelAddMode: () => void;
 }
 
 export const Toolbar = ({
   onAddNewMatch,
   newMatchesLength,
+  onCancelAddMode,
 }: ToolbarProps) => {
   const classes = useToolbarStyles();
   const { t } = useTranslation();
@@ -35,7 +37,7 @@ export const Toolbar = ({
         <Button
           variant="outline"
           color="red"
-          onClick={toggleRemoveMode}
+          onClick={newMatchesLength > 0 ? onCancelAddMode : toggleRemoveMode}
           size="sm"
           className={classes.button}
         >
@@ -68,7 +70,7 @@ export const Toolbar = ({
           onClick={onAddNewMatch}
           size="sm"
           className={classes.button}
-          disabled={newMatchesLength > 0}
+          disabled={isRemoveMode}
         >
           <span className="desktop-text">+ {t("addNewOpponent")}</span>
           <span className="mobile-text">{t("addNewOpponentShort")}</span>

@@ -44,9 +44,19 @@ export const Results = () => {
     resetState,
     resetAfterSave,
     clearNewMatches,
+    removeEmptyRows,
   } = useMatchesState(originalMatches);
 
   const { isRemoveMode, toggleRemoveMode, exitRemoveMode } = useRemoveMode();
+
+  const handleToggleRemoveMode = useCallback(() => {
+    removeEmptyRows();
+    toggleRemoveMode();
+  }, [removeEmptyRows, toggleRemoveMode]);
+
+  const handleCancelAddMode = useCallback(() => {
+    removeEmptyRows();
+  }, [removeEmptyRows]);
 
   const { duplicateError, checkDuplicate, clearDuplicateError } =
     useDuplicateValidation(originalMatches);
@@ -95,6 +105,7 @@ export const Results = () => {
         resetAfterSave();
         clearDuplicateError();
         exitRemoveMode();
+        removeEmptyRows();
       }
     } catch {
       // Silent error handling
@@ -111,6 +122,7 @@ export const Results = () => {
     resetAfterSave,
     clearDuplicateError,
     exitRemoveMode,
+    removeEmptyRows,
   ]);
 
   const handleLogoClick = useCallback(() => {
@@ -137,7 +149,7 @@ export const Results = () => {
     <ResultsProvider 
       hasChanges={hasChanges}
       isRemoveMode={isRemoveMode}
-      toggleRemoveMode={toggleRemoveMode}
+      toggleRemoveMode={handleToggleRemoveMode}
       exitRemoveMode={exitRemoveMode}
       isHelpMode={isHelpMode}
       currentStep={helpStep}
@@ -186,6 +198,7 @@ export const Results = () => {
         <Toolbar
           onAddNewMatch={addNewMatch}
           newMatchesLength={newMatches.length}
+          onCancelAddMode={handleCancelAddMode}
         />
 
         <MatchTable

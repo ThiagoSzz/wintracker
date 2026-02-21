@@ -115,6 +115,16 @@ export const useMatchesState = (originalMatches: Match[]) => {
     setNewMatches([]);
   }, []);
 
+  const removeEmptyRows = useCallback(() => {
+    setNewMatches((prev) => 
+      prev.filter((match) => 
+        match.opponent_name.trim().length > 0 || 
+        match.wins > 0 || 
+        match.losses > 0
+      )
+    );
+  }, []);
+
   const resetAfterSave = useCallback(() => {
     setNewMatches([]);
     setDeletedMatchIds(new Set());
@@ -132,5 +142,6 @@ export const useMatchesState = (originalMatches: Match[]) => {
     resetState,
     resetAfterSave,
     clearNewMatches,
+    removeEmptyRows,
   };
 };
