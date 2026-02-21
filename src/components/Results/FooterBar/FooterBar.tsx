@@ -1,7 +1,6 @@
 import { Group, Button, Tooltip, ActionIcon } from "@mantine/core";
 import { IconHelpHexagon, IconChartBar } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
-import { useReportGeneration } from "../../../hooks/useReportGeneration";
 import { useResultsContext } from "../../../pages/Results/ResultsContext";
 import { ReportModal } from "../../shared/ReportModal/ReportModal";
 import { useFooterBarStyles } from "./FooterBar.styles";
@@ -17,6 +16,13 @@ interface FooterBarProps {
   userName: string;
   isHelpMode: boolean;
   toggleHelpMode: () => void;
+  isGeneratingReport: boolean;
+  onGenerateReport: (matches: Match[], userName: string) => void;
+  reportImageUrl: string | null;
+  showReportModal: boolean;
+  onDownloadReport: () => void;
+  onOpenInNewPage: () => void;
+  onCloseReportModal: () => void;
 }
 
 export const FooterBar = ({
@@ -27,20 +33,18 @@ export const FooterBar = ({
   userName,
   isHelpMode,
   toggleHelpMode,
+  isGeneratingReport,
+  onGenerateReport,
+  reportImageUrl,
+  showReportModal,
+  onDownloadReport,
+  onOpenInNewPage,
+  onCloseReportModal,
 }: FooterBarProps) => {
   const classes = useFooterBarStyles();
   const { t } = useTranslation();
   const { hasChanges, currentStep } = useResultsContext();
 
-  const {
-    isGenerating,
-    reportImageUrl,
-    showReportModal,
-    generateReport,
-    downloadReport,
-    openInNewPage,
-    closeReportModal,
-  } = useReportGeneration();
 
   const currentStepId = currentStep?.id;
   const currentStepLabel = currentStep?.label;
@@ -52,7 +56,7 @@ export const FooterBar = ({
   };
 
   const handleGenerateReport = () => {
-    generateReport(matches, userName);
+    onGenerateReport(matches, userName);
   };
 
   return (
@@ -75,7 +79,7 @@ export const FooterBar = ({
               onClick={handleGenerateReport}
               color="blue"
               variant="outline"
-              loading={isGenerating}
+              loading={isGeneratingReport}
               disabled={matches.length === 0}
             >
               <IconChartBar size={20} strokeWidth={1.4} />
@@ -145,10 +149,10 @@ export const FooterBar = ({
 
       <ReportModal
         opened={showReportModal}
-        onClose={closeReportModal}
+        onClose={onCloseReportModal}
         imageUrl={reportImageUrl}
-        onDownload={downloadReport}
-        onOpenInNewPage={openInNewPage}
+        onDownload={onDownloadReport}
+        onOpenInNewPage={onOpenInNewPage}
       />
     </>
   );

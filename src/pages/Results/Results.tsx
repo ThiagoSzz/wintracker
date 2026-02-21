@@ -12,6 +12,7 @@ import { useDuplicateValidation } from "../../hooks/useDuplicateValidation";
 import { useMatchOperations } from "../../hooks/useMatchOperations";
 import { useGetUserMatches } from "../../hooks/useMatches";
 import { useHelpMode } from "../../hooks/useHelpMode";
+import { useReportGeneration } from "../../hooks/useReportGeneration";
 import { useUserStore } from "../../store/userStore";
 import { ResultsProvider } from "./ResultsContext";
 import { Toolbar } from "../../components/Results/Toolbar/Toolbar";
@@ -61,6 +62,18 @@ export const Results = () => {
     prevHelpStep,
     toggleHelpMode,
   } = useHelpMode(editableMatches.length, newMatches.length);
+
+  const {
+    isGenerating: isGeneratingReport,
+    reportImageUrl,
+    showReportModal,
+    reportError,
+    generateReport,
+    downloadReport,
+    openInNewPage,
+    closeReportModal,
+    clearReportError,
+  } = useReportGeneration();
 
   const handleSave = useCallback(async () => {
     if (!currentUser) return;
@@ -161,6 +174,15 @@ export const Results = () => {
           />
         )}
 
+        {reportError && (
+          <ErrorAlert
+            message={reportError}
+            title={t("reportError")}
+            onClose={clearReportError}
+            style={{ marginBottom: "1rem" }}
+          />
+        )}
+
         <Toolbar
           onAddNewMatch={addNewMatch}
           newMatchesLength={newMatches.length}
@@ -184,6 +206,13 @@ export const Results = () => {
           userName={currentUser.name}
           isHelpMode={isHelpMode}
           toggleHelpMode={toggleHelpMode}
+          isGeneratingReport={isGeneratingReport}
+          onGenerateReport={generateReport}
+          reportImageUrl={reportImageUrl}
+          showReportModal={showReportModal}
+          onDownloadReport={downloadReport}
+          onOpenInNewPage={openInNewPage}
+          onCloseReportModal={closeReportModal}
         />
 
         {isHelpMode && (

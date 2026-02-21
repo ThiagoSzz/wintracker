@@ -26,6 +26,7 @@ export const useReportGeneration = () => {
 
       if (!reportData.hasEnoughDataForWins && !reportData.hasEnoughDataForLosses) {
         setReportError(t('insufficientDataForReport'));
+        setIsGenerating(false);
         return;
       }
 
