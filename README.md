@@ -17,6 +17,7 @@ Wintracker allows users to maintain records of their competitive match results a
 3. **Match Tracking**: Record wins and losses for each opponent
 4. **Data Management**: Edit match results, update opponent names, delete records
 5. **History Viewing**: Review complete match history and statistics
+6. **Report Generation**: Generate reports with the biggest win and loss rates based on user data
 
 ## Tech Stack
 
