@@ -6,9 +6,9 @@ A mobile-first web application for tracking wins and losses in competitive match
 
 Wintracker allows users to maintain records of their competitive match results against various opponents. Users can create accounts, add opponents, and track their win/loss statistics over time. The application supports editing match history, managing opponent lists, and provides a clean interface for viewing performance data.
 
-<img width="243" height="528" alt="image" src="https://github.com/user-attachments/assets/4a3a3704-911a-485d-b0d3-b37e6aeaa363" />
-<img width="243" height="528" alt="image" src="https://github.com/user-attachments/assets/5262628e-90a7-43ae-acb3-200dea75f514" />
-<img width="243" height="528" alt="image" src="https://github.com/user-attachments/assets/c73aa5fe-5f6d-4c1a-bde1-cac28ac292e1" />
+<img width="243" height="528" alt="image" src="https://github.com/user-attachments/assets/7855b7c6-6545-462f-859d-0539d6b482bf" />
+<img width="243" height="528" alt="image" src="https://github.com/user-attachments/assets/f7809dad-079d-4076-bb87-69996cdee509" />
+<img width="243" height="528" alt="image" src="https://github.com/user-attachments/assets/572dbb78-b9b2-4ed8-8c04-6f0c008ca9b7" />
 
 ### Main Workflows
 
