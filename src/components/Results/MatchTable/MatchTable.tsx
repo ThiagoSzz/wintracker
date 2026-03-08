@@ -43,7 +43,8 @@ export const MatchTable = ({
       multiline
       withArrow
     >
-      <Table striped highlightOnHover withTableBorder>
+      <div className={classes.tableContainer}>
+        <Table striped highlightOnHover withTableBorder className={classes.table}>
         <Table.Thead>
           <Table.Tr>
             <Table.Th className={isRemoveMode ? classes.opponentColumnRemove : classes.opponentColumnNormal}>
@@ -91,7 +92,8 @@ export const MatchTable = ({
             />
           ))}
         </Table.Tbody>
-      </Table>
+        </Table>
+      </div>
     </Tooltip>
   );
 };
